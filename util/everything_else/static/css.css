@@ -1,0 +1,19 @@
+td { padding: 1px 1px 0 0; margin:0 }
+body { font-size:12pt }
+td { font-size: 12pt}
+ul { font-size:11pt }
+li { padding-top: 0.5pt }
+.topic_hl { font-weight:bold; color: darkblue; }
+.q_hl { font-weight:bold; color: darkred }
+a:hover { text-decoration: underline }
+a { text-decoration:none}
+a.t { color: #444; }
+a.m { color: #333; font-size: 10pt }
+a.at { color: #444 }
+.authors { font-size: 9pt }
+input#q { color: darkred }
+.topic_label { cursor:pointer;cursor:hand; color:darkblue }
+.topic_label.sel { background: yellow }
+span:hover.topic_label { cursor:pointer;cursor:hand; text-decoration:underline }  /*background:#6495ED }*/
+.more_tweets { font-size:11pt; padding-left: 20px}
+/* span:hover.topic_label.sel { background: yellow } */
