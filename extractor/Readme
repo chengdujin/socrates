@@ -1,0 +1,34 @@
+这个包的主要工作
+
+1. 进行tweets内容清理工作 （data_cleaner.py）
+   1）回复性的语言
+   2）交互的用户名
+   3）表情文字
+   4）URL
+   5）hashtags
+   6）中英文区分
+
+2. 中英文分词 （segmenter.py）
+   现在能用到的中文分词开源库/REST API包括
+   1) 清华大学CSAI NLP (HTTP GET)
+   2）Lucene中文分词 Paoding Analysis (Java)
+   3) SCWS (HTTP POST)
+   4) pymseg-cpp (Python)    
+
+3. 去除噪音的过滤器（filter.py）
+   1）中文去除过程是基于维基百科的内容
+   2）内存中会常驻常用的词汇，以加快寻词速度
+   3）英文会用Porter Stemmer稍微过滤一遍，去除常用的Stop words
+
+4. 微博生成器（tweet_generator.py）
+   每条结构化处理后的tweet至少应该包括如下内容：
+   1）发布时间
+   2）交互的人
+   3）URL
+   4）hashtags
+   5）英文分词
+   6）中文分词  
+
+5. 微博主题/兴趣提取（interest_extractor.py）
+   1) TextRank
+   2) Ranker
