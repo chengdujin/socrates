@@ -1,0 +1,7 @@
+setup.py
+ttp.py
+twitter_text_python.egg-info/PKG-INFO
+twitter_text_python.egg-info/SOURCES.txt
+twitter_text_python.egg-info/dependency_links.txt
+twitter_text_python.egg-info/not-zip-safe
+twitter_text_python.egg-info/top_level.txt
