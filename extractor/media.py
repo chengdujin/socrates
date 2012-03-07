@@ -64,8 +64,8 @@ class Twitter(Document):
         segments = text.split(' ')
         chinese = []
         latin = []
-        chinese_punctuation = '！￥（）【】、‘’“”；：？。，《》' # utf-8 size: 3 unicode: 1
-        trans_table = string.maketrans(string.punctuation, ' ' * len(string.punctuation)) 
+        unwanted = string.punctuation + string.digits
+        trans_table = string.maketrans(unwanted + , ' ' * len(unwanted)) 
         for word in segments:
             # remove unnecessary characters
             word = (word.encode('utf-8')).translate(trans_table).strip()
