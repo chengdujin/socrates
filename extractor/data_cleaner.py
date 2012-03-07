@@ -18,13 +18,10 @@ sys.setdefaultencoding('UTF-8')
 
 ## CONSTANTS
 TWEETMOTIF_PATH = "/Users/Yuan/Downloads/socrates/libs/tweetmotif/"
+CHINESE_STOP_WORDS = '/Users/Yuan/Downloads/socrates/extractor/chinese_stop_words'
 
 
-def segment_tweet():
-    ''
-    pass
-
-def filter_tweet(word_list):
+def __filter_tweet(word_list):
     'remove punctuations, digits, space and separate chinese and latins'
     import re, string
     
@@ -42,7 +39,7 @@ def filter_tweet(word_list):
 
     return chinese, latin
 
-def clean_data(tweets):
+def __clean_data(tweets):
     '''text reduction and collection, including the following
        1. collect users involved
        2. collect urls
@@ -90,11 +87,11 @@ def clean_data(tweets):
         tweet_instance.latin = latin
 
         tweet_instances.append(tweet_instance)
-        if tweet_instance.hashtags:
-            print str(tweet_instance)
+        #if tweet_instance.hashtags:
+        #    print str(tweet_instance)
     return tweet_instances
 
-def collect_data():
+def __collect_data():
     'collect data from mongodb'
     # stop words for tweet info keys
     screen_tweet_info = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'in_reply_to_screen_name', 'in_reply_to_user_id', 'user']
@@ -117,11 +114,7 @@ def collect_data():
     
     return tweets
 
-def main():
-    'collect the data and rinse them'
+def cleaner():
+    'collect, rearrange and filter the tweets '
     tweet_list = collect_data()
     clean_list = clean_data(tweet_list)
-
-if __name__ == '__main__':
-    main()
-
