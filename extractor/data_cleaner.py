@@ -19,6 +19,7 @@ sys.setdefaultencoding('UTF-8')
 ## CONSTANTS
 TWEETMOTIF_PATH = "/Users/Yuan/Downloads/socrates/libs/tweetmotif/"
 
+
 def segment_tweet():
     ''
     pass
