@@ -60,7 +60,9 @@ def orthodoxize_time(time_piece, time_format):
 def analyze_tweets(tweets):
     'keep what is necessary'
     first_candidates = []
+    sys.path.append("/Users/Yuan/Downloads/socrates/libs/tweetmotif/")
     import twokenize
+
     for tweet in tweets:
         text = tweet['text']
         word_list = twokenize.tokenize(text)
