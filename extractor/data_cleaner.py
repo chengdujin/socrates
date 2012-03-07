@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.06
-# @latest 2012.03.06
+# @latest 2012.03.07
 #
 
 # reload the script encoding
@@ -16,28 +16,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
-
-class Tweet:
-    'class dedicated to tweet modeling'
-    def __init__(self, id_ = None, text= None, favorited = None, created_at= None, retweeted = None, source = None):
-        self.id_ = id_
-	self.text = text
-        self.favorited = favorited
-        self.created_at = created_at
-        self.retweeted = retweeted
-        self.source = source
-	
-	# properties importantes
-        self.users = []
-        self.urls = []
-        self.hashtags = []
-        
-	self.keywords = []
-        self.chinese = []
-        self.latin = []
-
-    def __str__(self):
-        return 'keywords:\n' + str(self.keywords) + '\nchiense:\n' + str(self.chinese) + '\nlatin:\n' + str(self.latin) + '\nurls:\n' + str(self.urls) + '\nhashtags:\n' + str(self.hashtags) + '\nusers:\n' + str(self.users) + '\ncreated_at:\n' + str(self.created_at) + '\nsource:\n' + str(self.source) + '\n'
+## CONSTANTS
+TWEETMOTIF_PATH = "/Users/Yuan/Downloads/socrates/libs/tweetmotif/"
 
 def segment_tweet():
     ''
@@ -68,13 +48,13 @@ def clean_data(tweets):
        3. collect hashtags
        4. remove emotion words
        5. separate chinese and english'''
-    sys.path.append("/Users/Yuan/Downloads/socrates/libs/tweetmotif/")
-    import ttp, HTMLParser
+    sys.path.append(TWEETMOTIF_PATH)
+    import ttp, HTMLParser, Tweet
     
     tweet_instances = []
     for tweet in tweets:
         # tweet id
-        tweet_instance = Tweet(tweet['id'])
+        tweet_instance = Tweet.Tweet(tweet['id'])
         tweet_instance.created_at = tweet['created_at']        
         tweet_instance.source = HTMLParser.HTMLParser().unescape(tweet['source'])
         tweet_instance.retweeted = tweet['retweet_count']
