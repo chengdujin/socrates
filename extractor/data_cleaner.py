@@ -17,9 +17,15 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 ## CONSTANTS
-TWEETMOTIF_PATH = "/Users/Yuan/Downloads/socrates/libs/tweetmotif/"
 CHINESE_STOP_WORDS = '/Users/Yuan/Downloads/socrates/extractor/chinese_stop_words'
 
+## Database Configuration
+DB_HOST = 'localhost'
+DB_PORT = '27017'
+
+##
+# stop words for tweet keys
+tweet_screen_keys = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'in_reply_to_screen_name', 'in_reply_to_user_id', 'user']
 
 def __filter_tweet(word_list):
     'remove punctuations, digits, space and separate chinese and latins'
@@ -39,14 +45,13 @@ def __filter_tweet(word_list):
 
     return chinese, latin
 
-def __clean_data(tweets):
+def __model_data(docs):
     '''text reduction and collection, including the following
        1. collect users involved
        2. collect urls
        3. collect hashtags
        4. remove emotion words
        5. separate chinese and english'''
-    sys.path.append(TWEETMOTIF_PATH)
     import ttp, HTMLParser, Tweet
     
     tweet_instances = []
@@ -82,7 +87,7 @@ def __clean_data(tweets):
         
         # separate chinese and latin, remove emotions and others 
         segments = text.split(' ')
-        chinese, latin = filter_tweet(segments)
+        chinese, latin = __filter_tweet(segments)
         tweet_instance.chinese = chinese
         tweet_instance.latin = latin
 
@@ -91,30 +96,42 @@ def __clean_data(tweets):
         #    print str(tweet_instance)
     return tweet_instances
 
-def __collect_data():
+def __collect_data(source):
     'collect data from mongodb'
-    # stop words for tweet info keys
-    screen_tweet_info = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'in_reply_to_screen_name', 'in_reply_to_user_id', 'user']
-    tweets = []    
+    docs = []    
 
     from pymongo import Connection
-    con = Connection('localhost', 27017)
-    cursor = con.tweets.tweets.find()
-    if cursor.count() > 0:
-        for tweet_mongo in cursor:
-            tweet = {}
-            for key in tweet_mongo.keys():
-		if not (key in screen_tweet_info):
-		    # unicode
-                    tweet[key] = (tweet_mongo[key])
-	    if tweet:
-	        tweets.append(tweet)
+    con = Connection(DB_HOST, DB_PORT)
+    if source == 'twitter': 
+        cursor = con.tweets.tweets.find()
+    elif source == 'songshuhui':
+        cursor = con.songshuhui.songshuhui.find()
     else:
-        print '[Error] Nothing is found for the user'
-    
-    return tweets
+        return Exception("[Error] __collect_data: Such source does not exist!")
 
-def cleaner():
-    'collect, rearrange and filter the tweets '
-    tweet_list = collect_data()
-    clean_list = clean_data(tweet_list)
+    if cursor.count() > 0:
+        for item in cursor:
+            doc = {}
+            for key in item.keys():
+		if source == 'twitter':
+		    if not (key in twitter_screen_keys):
+		        # unicode
+                        doc[key] = item[key]
+		elif source == 'songshuhui':
+                    pass
+	    if doc:
+	        docs.append(doc)
+    else:
+        return Exception('[Error] __collect_data: Nothing is found!')
+    
+    return docs
+
+def cleaner(source='twitter'):
+    'collect, rearrange and filter information'
+    try:
+        docs = __collect_data(source)
+        collection = __model_data(docs)
+        return collection
+    except Exception as e:
+        print e
+        return None
