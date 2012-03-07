@@ -1,6 +1,7 @@
 这个包的主要工作
 
-1. 进行tweets内容清理工作 （data_cleaner.py）
+1. 进行内容清理工作 （cleaner.py）
+   针对tweet:
    1）回复性的语言
    2）交互的用户名
    3）表情文字
@@ -20,7 +21,8 @@
    2）内存中会常驻常用的词汇，以加快寻词速度
    3）英文会用Porter Stemmer稍微过滤一遍，去除常用的Stop words
 
-4. 微博生成器（tweet_generator.py）
+4. 文章生成器（document_generator.py）
+   针对tweet:
    每条结构化处理后的tweet至少应该包括如下内容：
    1）发布时间
    2）交互的人

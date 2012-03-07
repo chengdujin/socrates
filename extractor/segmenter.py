@@ -15,6 +15,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
+# CONSTANTS
+CHINESE_STOP_WORDS = '/Users/Yuan/Downloads/socrates/extractor/chinese_stop_words'
 
 def segment_tweet(tweets):
     'simple chinese segmentation'
