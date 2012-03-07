@@ -22,15 +22,16 @@ DOCUMENT_PATH = '/Users/Yuan/Downloads/socrates/extractor'
 DB = {'host':'localhost', 'port':27017}
 
 
-def cleaner(source='twitter'):
+def clean(source='twitter'):
     'collect, rearrange and filter information'
     sys.path.append(DOCUMENT_PATH)
     import media
-
     doc_type = media.Document()
-    if 'twitter' in source:
+
+    source = source.strip().lower()
+    if source == 'twitter':
         doc_type = media.Twitter()
-    elif 'songshuhui' in source:
+    elif source == 'songshuhui':
         #doc_type = media.News()
         pass
     else:
@@ -43,10 +44,9 @@ def cleaner(source='twitter'):
     collection = []
     for doc in docs:
         item = doc_type.build_model(doc)
-        print ', '.join(item.latin)
         collection.append(item)
 
     return collection
 
 if __name__ == '__main__':
-    cleaner('twitter')
+    clean('twitter')
