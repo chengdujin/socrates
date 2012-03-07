@@ -20,12 +20,8 @@ sys.setdefaultencoding('UTF-8')
 CHINESE_STOP_WORDS = '/Users/Yuan/Downloads/socrates/extractor/chinese_stop_words'
 
 ## Database Configuration
-DB_HOST = 'localhost'
-DB_PORT = '27017'
+DB = {'host':'localhost', 'port':'27017'}
 
-##
-# stop words for tweet keys
-tweet_screen_keys = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'in_reply_to_screen_name', 'in_reply_to_user_id', 'user']
 
 def __filter_tweet(word_list):
     'remove punctuations, digits, space and separate chinese and latins'
@@ -46,90 +42,30 @@ def __filter_tweet(word_list):
     return chinese, latin
 
 def __model_data(docs):
-    '''text reduction and collection, including the following
-       1. collect users involved
-       2. collect urls
-       3. collect hashtags
-       4. remove emotion words
-       5. separate chinese and english'''
-    import ttp, HTMLParser, Tweet
-    
-    tweet_instances = []
-    for tweet in tweets:
-        # tweet id
-        tweet_instance = Tweet.Tweet(tweet['id'])
-        tweet_instance.created_at = tweet['created_at']        
-        tweet_instance.source = HTMLParser.HTMLParser().unescape(tweet['source'])
-        tweet_instance.retweeted = tweet['retweet_count']
-        tweet_instance.favorited = tweet['favorited']
+   'fill in the document instance with data from the docs' 
+    collection = []
+    for doc in docs:
+        item = Document()
+        item.build_model(doc)
+        collection.append(item)
+    return collection
 
-        text = HTMLParser.HTMLParser().unescape(tweet['text'])
-        tweet_instance.text = text
-        parsed_text = ttp.Parser().parse(text)
-
-        # tweet replied users
-	tweet_instance.users = parsed_text.users
-        for user in tweet_instance.users:
-            user = '@%s' % user
-            if user in text:
-                text =  text.replace(user, '')
-        # tweet hashtags
-        tweet_instance.hashtags = parsed_text.tags
-        for hashtag in tweet_instance.hashtags:
-            hashtag = '#%s' % hashtag
-            if hashtag in text:
-                text = text.replace(hashtag, '')
-        # tweet urls
-        tweet_instance.urls = parsed_text.urls
-        for url in tweet_instance.urls:
-            if url in text:
-                text = text.replace(url, '')
-        
-        # separate chinese and latin, remove emotions and others 
-        segments = text.split(' ')
-        chinese, latin = __filter_tweet(segments)
-        tweet_instance.chinese = chinese
-        tweet_instance.latin = latin
-
-        tweet_instances.append(tweet_instance)
-        #if tweet_instance.hashtags:
-        #    print str(tweet_instance)
-    return tweet_instances
-
-def __collect_data(source):
+def __collect_data(doc):
     'collect data from mongodb'
-    docs = []    
-
-    from pymongo import Connection
-    con = Connection(DB_HOST, DB_PORT)
-    if source == 'twitter': 
-        cursor = con.tweets.tweets.find()
-    elif source == 'songshuhui':
-        cursor = con.songshuhui.songshuhui.find()
-    else:
-        return Exception("[Error] __collect_data: Such source does not exist!")
-
-    if cursor.count() > 0:
-        for item in cursor:
-            doc = {}
-            for key in item.keys():
-		if source == 'twitter':
-		    if not (key in twitter_screen_keys):
-		        # unicode
-                        doc[key] = item[key]
-		elif source == 'songshuhui':
-                    pass
-	    if doc:
-	        docs.append(doc)
-    else:
-        return Exception('[Error] __collect_data: Nothing is found!')
-    
-    return docs
+    return doc.read_datase(DB)
 
 def cleaner(source='twitter'):
     'collect, rearrange and filter information'
     try:
-        docs = __collect_data(source)
+        doc_type = Document()
+        if 'twitter' in source:
+            doc_type = Twitter()
+        elif 'songshuhui' in source:
+            doc_type = News()
+        else:
+            return Exception('[error] cleaner: such source does not exist!')
+
+        docs = __collect_data(doc_type)
         collection = __model_data(docs)
         return collection
     except Exception as e:
