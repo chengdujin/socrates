@@ -7,7 +7,7 @@
 # 
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
-# @since 2012.03.06
+# @since 2012.03.07
 # @latest 2012.03.07
 #
 
@@ -16,11 +16,14 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
+# segmentation
+WEB_SERVICE_SEG = 'http://jkx.fudan.edu.cn/fudannlp/seg/%s'
+# keywords
+WEB_SERVICE_KEY = 'http://jkx.fudan.edu.cn/fudannlp/key/%s'
 CHINESE_STOP_WORDS = '/Users/Yuan/Downloads/socrates/extractor/chinese_stop_words'
 
-def segment_tweet(tweets):
-    'simple chinese segmentation'
-    import mmseg
+def segment(tweets):
+    'segmentation based on fudannlp web services'
 
     file = open(CHINESE_STOP_WORDS, 'r')
     stop_words_raw = file.readlines()
@@ -29,7 +32,11 @@ def segment_tweet(tweets):
     for w in stop_words_raw:
         stop_words.append(w.strip())
 
-    mmseg.dict_load_defaults()
+    import urllib2
+    con = urllib2.urlopen('http://jkx.fudan.edu.cn/fudannlp/seg/%s' % )
+    data = con.read()
+
+    
     for tweet in tweets:
         chinese = tweet.chinese
         for word in chinese:
@@ -40,3 +47,6 @@ def segment_tweet(tweets):
                     if not text.encode('utf-8') in stop_words:
                         tweet.keywords.append(text) # unicode
         print ' '.join(tweet.chinese) 
+
+if __name__ == '__main__':
+    segment()
