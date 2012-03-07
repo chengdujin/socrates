@@ -34,20 +34,21 @@ def segment(collection):
     'collection is a list of media.Tweet instances'
 
     for item in collection:
-        old_chinese = ' '.join(item.chinese) # data in list are unicode 
-        #old_chinese = item # test code
-        new_chinese = []
-        con = urllib2.urlopen(WEB_SERVICE_SEG % old_chinese)
-        web_data = con.read().split(' ')[1:]
-        for segment in web_data:
-	    segment = segment.strip().decode('utf-8')
-            if not segment in UNWANTED:
-                # duplicated words should be tolerated
-		if segment.isalpha():
-                    item.latin.append(segment)
-                else:
-                    new_chinese.append(segment)
-	item.chinese = new_chinese
+        if isinstance(item, Tweet):
+            old_chinese = ' '.join(item.chinese) # data in list are unicode 
+            #old_chinese = item # test code
+            new_chinese = []
+            con = urllib2.urlopen(WEB_SERVICE_SEG % old_chinese)
+            web_data = con.read().split(' ')[1:]
+            for segment in web_data:
+	        segment = segment.strip().decode('utf-8')
+                if not segment in UNWANTED:
+                    # duplicated words should be tolerated
+		    if segment.isalpha():
+                        item.latin.append(segment)
+                    else:
+                        new_chinese.append(segment)
+	    item.chinese = new_chinese
     return collection
 
 if __name__ == '__main__':
