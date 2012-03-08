@@ -30,12 +30,6 @@ CHINESE_UNWANTED = '﹑・–→「」～！￥（）【】、‘’“”；：
 ENGLSIH_UNWANTED = string.punctuation + string.whitespace
 UNWANTED = CHINESE_UNWANTED + ENGLSIH_UNWANTED 
 
-def __publish(item):
-    'store the result in database'
-    from pymongo import Connection
-    con = Connection('localhost', 27017)
-    col = con.tweets.chinese
-    col.insert({'id':item.id_, 'seg':','.join(item.chinese)})
 
 def segment(collection):
     'segmentation based on fudannlp web services'
@@ -43,7 +37,7 @@ def segment(collection):
     import media
 
     for id, item in enumerate(collection):
-        if isinstance(item, media.Tweet):
+        if isinstance(item, media.Tweet) or isinstance(item, media.Article):
             old_chinese = ' '.join(item.chinese) # data in list are unicode 
             #old_chinese = item # test code
             if old_chinese and len(old_chinese) > 2:
@@ -65,7 +59,6 @@ def segment(collection):
 		    if new_chinese:
 	                item.chinese = new_chinese
 		        print str(id + 1), ','.join(new_chinese)
-		        __publish(item)
 		except Exception as e:
 		    print e 
 		    continue

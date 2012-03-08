@@ -17,18 +17,37 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 
-def generate(source='twitter'):
+def publish(docs, source):
+    'leave a mark in database'
+    source_info = source.strip().lower().split('/')
+    database = source_info[0]
+    collection = source_info[1]
+
+    from pymongo.errors import CollectionInvalid
+    from pymongo.connection import Connection
+    con = Connection('localhost', 27017)
+    from pymongo.database import Database
+    db = Database(con, database)
+    from pymongo.collection import Collection
+    new_collection = collection + '.chinese'
+    col = None
+    try:
+        col = db.create_collection(new_collection)
+    except CollectionInvalid as e:
+        col = Collection(db, new_collection)
+    for doc in docs:
+        col.insert({'seg':doc.chinese}) 
+
+def generate(source='articles/cnBeta'):
     'combines cleaner and segmenter'
     import cleaner, segmenter
     
     documents = []
-    source = source.strip().lower()
-    if source == 'twitter':
-        'output a list of Tweet instances'
-        tweets = cleaner.clean(source)
-        documents = segmenter.segment(tweets)
-
+    items = cleaner.clean(source)
+    documents = segmenter.segment(items)
+    publish(documents, source)
+    
     return documents
 
 if __name__ == '__main__':
-    generate('twitter')
+    generate('tweets/tweets')

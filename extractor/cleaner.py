@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.06
-# @latest 2012.03.07
+# @latest 2012.03.08
 #
 
 # reload the script encoding
@@ -20,20 +20,25 @@ sys.setdefaultencoding('UTF-8')
 DOCUMENT_PATH = '/Users/Yuan/Downloads/socrates/extractor'
 # Database Configuration
 DB = {'host':'localhost', 'port':27017}
+MICRO_BLOGS = ['tweets', 'weibo']
+NEWS_SOURCES = ['cnbeta', 'songshuhui', 'hacker news']
 
-
-def clean(source='twitter'):
+def clean(source='articles/cnBeta'):
     'collect, rearrange and filter information'
     sys.path.append(DOCUMENT_PATH)
     import media
     doc_type = media.Document()
-
     source = source.strip().lower()
-    if source == 'twitter':
+    
+    # [0] database name [1] collection name
+    source_info = source.split('/')
+    DB['db'] = source_info[0]
+    DB['collection'] = source_info[1]
+    
+    if source_info[1] in MICRO_BLOGS:
         doc_type = media.Twitter()
-    elif source == 'songshuhui':
-        #doc_type = media.News()
-        pass
+    elif source_info[1] in NEWS_SOURCES:
+        doc_type = media.News()
     else:
         return Exception('[error] cleaner: such source does not exist!')
 
@@ -49,4 +54,4 @@ def clean(source='twitter'):
     return collection
 
 if __name__ == '__main__':
-    clean('twitter')
+    clean('articles/cnbeta')

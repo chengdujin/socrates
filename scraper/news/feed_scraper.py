@@ -154,7 +154,7 @@ def retrieve_data(url, limit):
 def main():
     'entrance to feeds retrieval and storing'
     host = 'http://www.cnbeta.com/backend.php'
-    host_name = 'cnBeta'
+    host_name = 'cnBeta'.strip().lower()
     limit = 1000
     data = retrieve_data(host, limit)
     feeds = parse_feeds(data, limit)

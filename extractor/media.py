@@ -7,10 +7,13 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.07
-# @latest 2012.03.07
+# @latest 2012.03.08
 #
 
-from pymongo import Connection
+from pymongo.connection import Connection
+from pymongo.database import Database
+from pymongo.collection import Collection
+
 # reload the script encoding
 import sys
 reload(sys)
@@ -23,17 +26,23 @@ class Document(object):
         pass
 
     def collect_data(self, database):
-        pass
-
-    def read_databse(self, collection, screen_keys):
         'read out unicode data from mongodb'
+        con = Connection(database['host'], database['port'])
+        db = Database(con, database['db']) 
+        col = Collection(db, database['collection'])
+        screener = None
+        if 'screener' in database:
+            screener = database['screener']
+
         docs = []
-        cursor = collection.find()
+        cursor = col.find()
         if cursor.count() > 0:
             for entry in cursor:
 		doc = {}
                 for key in entry.keys():
-		    if not key in screen_keys:
+                    if screener and not key in screener:
+			doc[key] = entry[key]
+		    elif not screener:
 			doc[key] = entry[key]
 	        if doc:
 		    docs.append(doc)
@@ -45,19 +54,7 @@ class Document(object):
         pass
 
 
-class Twitter(Document):
-    'class that deals with twitter specific issues'
-    def __init__(self):
-	pass
-
-    def collect_data(self, database):
-        con = Connection(database['host'], database['port'])
-        collection = con.tweets.tweets
-
-        twitter_screen_keys = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'i    n_reply_to_screen_name', 'in_reply_to_user_id', 'user']
-        return super(Twitter, self).read_databse(collection, twitter_screen_keys)
-
-    def __separate_languages(self, text):
+    def separate_languages(self, text):
         'remove punctuations, digits, space and separate chinese and latins'
         import re, string
     
@@ -77,6 +74,38 @@ class Twitter(Document):
                 chinese.append(word.decode('utf-8'))
 
         return chinese, latin
+
+
+class News(Document):
+    'class that deals with news sources mainly collected from rss via google reader'
+    def __init__(self):
+        pass
+
+    def collect_data(self, database):
+        return super(News, self).collect_data(database)
+
+    def build_model(self, doc):
+        article = Article() 
+        article.author = doc['author']
+        article.title = doc['title']
+        article.published = doc['published']
+        article.source = doc['source']
+        article.category = doc['category']
+ 
+        chinese, latin = super(News, self).separate_languages(doc['title'])
+        article.chinese = chinese
+        article.latin = latin
+        return article
+
+
+class Twitter(Document):
+    'class that deals with twitter specific issues'
+    def __init__(self):
+	pass
+
+    def collect_data(self, database):
+        database['screener'] = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'i    n_reply_to_screen_name', 'in_reply_to_user_id', 'user']
+        return super(Twitter, self).collect_data(database)
 
     def build_model(self, doc):
         '''text reduction and collection, including the following
@@ -116,11 +145,27 @@ class Twitter(Document):
                 text = text.replace(url, '') 
             
         # separate chinese and latin, remove emotions and others 
-        chinese, latin = self.__separate_languages(text)
+        chinese, latin = super(Twitter, self).separate_languages(text)
         tweet.chinese = chinese
         tweet.latin = latin
         
         return tweet
+
+
+class Article():
+    ''
+    def __init__(self, author = None, title = None, published = None, source = None, category = None):
+	self.author = author
+        self.title = title
+        self.published = published
+        self.source = source
+        self.category = []
+        
+        self.chinese = []
+        self.latin = []
+        
+    def __str__(self):
+        return 'title:\n' + str(self.title) + '\nauthor:\n' + str(self.author) + '\npublished:\n' + str(self.published) + '\nsource:\n' + str(self.source) + '\ncategory:\n' + ','.join(self.category) + '\n'  
 
 
 class Tweet:
