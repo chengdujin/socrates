@@ -27,22 +27,31 @@ CLIENT_ID = "149442296180.apps.googleusercontent.com"
 CLIENT_SECRET = "w9M59S7pdsRUoZLCrMuy1hG8"
 
 
-def store_feeds(feeds):
+def store_feeds(feeds, collection):
     'store the feeds in mongodb '
-    from pymongo import Connection
-    con = Connection('176.34.54.120', 27017)
-    db = con.songshuhui_articles
+    from pymongo.errors import CollectionInvalid
+    from pymongo.collection import Collection
+    from pymongo.connection import Connection
+    con = Connection('localhost', 27017)
+    from pymongo.database import Database
+    db = Database(con, 'articles')
+
+    col = None
+    try:
+        col = db.create_collection(collection)
+    except CollectionInvalid as e:
+        col = Collection(db, collection)
 
     for feed in feeds:
         if 'title' in feed:
-            cursor = db.songshuhui_articles.find({'title':'%s' % feed['title']})
+            cursor = col.find({'title':'%s' % feed['title']})
             if cursor.count() > 0:
                 continue
         elif 'source' in feed:
-            cursor = db.songshuhui_articles.find({'source':'%s' % feed['source']})
+            cursor = col.find({'source':'%s' % feed['source']})
             if cursor.count() > 0:
                 continue
-        db.songshuhui_articles.save(feed)
+        col.save(feed)
 
 def parse_feeds(data, limit):
     'parse out necessary information'
@@ -144,9 +153,12 @@ def retrieve_data(url, limit):
 
 def main():
     'entrance to feeds retrieval and storing'
-    data = retrieve_data('http://feed.williamlong.info/', 300)
-    feeds = parse_feeds(data, 300)
-    store_feeds(feeds)
+    host = 'http://www.cnbeta.com/backend.php'
+    host_name = 'cnBeta'
+    limit = 1000
+    data = retrieve_data(host, limit)
+    feeds = parse_feeds(data, limit)
+    store_feeds(feeds, host_name)
 
 if __name__ == '__main__':
     main()
