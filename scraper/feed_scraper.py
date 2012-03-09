@@ -19,8 +19,8 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-SOURCE_URL = 'http://ben304.sinaapp.com/zhihu-read.php'
-SOURCE_NAME = 'zhihu'.strip().lower()
+SOURCE_URL = 'http://content.businessvalue.com.cn/feed'
+SOURCE_NAME = 'business_value'.strip().lower()
 LIMIT = 1000
 GOOGLE_REQUEST_URL = 'http://www.google.com/reader/atom/feed/%s?n=%s'
 

@@ -16,7 +16,7 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-DB = ('176.34.54.120', 27017)
+DB = '176.34.54.120:27017'
 USER = 'chengdujin'
 
 def parse_and_store(user, data):
@@ -63,7 +63,7 @@ def scrape():
     'entrance to tweets retrieval and analysis'
     max_id = ''
     while True:
-        data = retrive_data(USER, max_id)
+        data = retrieve_data(USER, max_id)
         max_id = parse_and_store(USER, data)
         print max_id
         if not max_id:
