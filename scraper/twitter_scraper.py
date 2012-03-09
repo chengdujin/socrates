@@ -17,7 +17,7 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-USER = 'chengdujin'
+USER = 'mijia'
 
 def parse_and_store(user, data):
     from pymongo.connection import Connection
@@ -46,14 +46,14 @@ def parse_and_store(user, data):
 			print tweet
             if doc:
 		if 'id' in doc:	
-                    db.tweets.save(doc)
+                    collection.save(doc)
                     lowest_id = doc['id']
     return lowest_id
 
 def retrieve_data(user, max_id):
     import httplib
     con = httplib.HTTPConnection("api.twitter.com")
-    con.request("GET", "/1/statuses/user_timeline.xml?contributor_details=0&trim_user=1&count=200&screen_name=%s&%s" % (user, max_id))
+    con.request("GET", "/1/statuses/user_timeline.xml?contributor_details=0&trim_user=1&count=100&screen_name=%s&%s" % (user, max_id))
     reply = con.getresponse()
     data = reply.read()
     con.close()
