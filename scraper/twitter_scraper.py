@@ -15,11 +15,17 @@ import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
+# CONSTANTS
+DB = ('176.34.54.120', 27017)
+USER = 'chengdujin'
 
-def parse_and_store(data):
-    from pymongo import Connection
-    con = Connection('176.34.54.120', 27017)
-    db = con.tweets
+def parse_and_store(user, data):
+    from pymongo.connection import Connection
+    con = Connection(DB)
+    from pymongo.database import Database
+    db = Database(con, 'twitter')
+    from pymongo.collection import Collection
+    collection = Collection(db, user)
 
     from BeautifulSoup import BeautifulStoneSoup
     root = BeautifulStoneSoup(data)
@@ -31,9 +37,12 @@ def parse_and_store(data):
             for item in tweet.contents:
                 if item <> '\n':
 		    try:
-                        doc[item.name] = str(item.string)
+			if item.string == 'created_at':
+			    item_name = 'published'
+			else:
+			    item_name = item.name
+                        doc[item_name] = str(item.string)
 		    except Exception as e:
-			print item
 			print tweet
             if doc:
 		if 'id' in doc:	
@@ -41,7 +50,7 @@ def parse_and_store(data):
                     lowest_id = doc['id']
     return lowest_id
 
-def data_retv(user, max_id):
+def retrieve_data(user, max_id):
     import httplib
     con = httplib.HTTPConnection("api.twitter.com")
     con.request("GET", "/1/statuses/user_timeline.xml?contributor_details=0&trim_user=1&count=200&screen_name=%s&%s" % (user, max_id))
@@ -50,12 +59,12 @@ def data_retv(user, max_id):
     con.close()
     return data
 
-def main():
+def scrape():
     'entrance to tweets retrieval and analysis'
     max_id = ''
     while True:
-        data = data_retv('chengdujin', max_id)
-        max_id = parse_and_store(data)
+        data = retrive_data(USER, max_id)
+        max_id = parse_and_store(USER, data)
         print max_id
         if not max_id:
             break
@@ -63,4 +72,4 @@ def main():
             max_id = 'max_id=' + str(int(max_id) - 1)
 
 if __name__ == '__main__':
-    main()
+    scrape()

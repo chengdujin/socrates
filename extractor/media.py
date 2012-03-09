@@ -10,15 +10,14 @@
 # @latest 2012.03.08
 #
 
-from pymongo.connection import Connection
-from pymongo.database import Database
-from pymongo.collection import Collection
 
 # reload the script encoding
 import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
+# CONSTANTS
+DB = ('176.34.54.120', 27017)
 
 class Document(object):
     'parent class of all source classes'
@@ -27,8 +26,11 @@ class Document(object):
 
     def collect_data(self, database):
         'read out unicode data from mongodb'
-        con = Connection(database['host'], database['port'])
+	from pymongo.connection import Connection
+        con = Connection(DB)
+	from pymongo.database import Database
         db = Database(con, database['db']) 
+        from pymongo.collection import Collection
         col = Collection(db, database['collection'])
         screener = None
         if 'screener' in database:
@@ -117,7 +119,7 @@ class Twitter(Document):
         
         import ttp, HTMLParser
 	tweet = Tweet(doc['id'])
-        tweet.created_at = doc['created_at']            
+        tweet.published = doc['created_at']            
         tweet.source = HTMLParser.HTMLParser().unescape(doc['source'])
         tweet.retweeted = doc['retweet_count']
         tweet.favorited = doc['favorited']
@@ -169,11 +171,11 @@ class Article():
 
 
 class Tweet:
-    def __init__(self, id_ = None, text= None, favorited = None, created_at= None, retweeted = None, source = None):
+    def __init__(self, id_ = None, text = None, favorited = None, published = None, retweeted = None, source = None):
         self.id_ = id_
         self.text = text
         self.favorited = favorited
-        self.created_at = created_at
+        self.published = published
         self.retweeted = retweeted
         self.source = source
 
@@ -187,4 +189,4 @@ class Tweet:
         self.latin = []
         
     def __str__(self):
-        return 'keywords:\n' + str(self.keywords) + '\nchiense:\n' + str(self.chinese) + '\nlatin:\n' + str(self.latin) + '\nurls:\n' + str(self.urls) + '\nhashtags:\n' + str(self.hashtags) + '\nusers:\n' + str(self.users) + '\ncreated_at:\n' + str(self.created_at) + '\nsource:\n' + str(self.source) + '\n'
+        return 'keywords:\n' + str(self.keywords) + '\nchinese:\n' + str(self.chinese) + '\nlatin:\n' + str(self.latin) + '\nurls:\n' + str(self.urls) + '\nhashtags:\n' + str(self.hashtags) + '\nusers:\n' + str(self.users) + '\npublished:\n' + str(self.created_at) + '\nsource:\n' + str(self.source) + '\n'

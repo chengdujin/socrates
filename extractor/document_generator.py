@@ -17,6 +17,9 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 
+# CONSTANTS
+DB = ('176.34.54.120', 27017)
+
 def publish(docs, source):
     'leave a mark in database'
     source_info = source.strip().lower().split('/')
@@ -25,7 +28,7 @@ def publish(docs, source):
 
     from pymongo.errors import CollectionInvalid
     from pymongo.connection import Connection
-    con = Connection('localhost', 27017)
+    con = Connection(DB)
     from pymongo.database import Database
     db = Database(con, database)
     from pymongo.collection import Collection
@@ -38,7 +41,7 @@ def publish(docs, source):
     for doc in docs:
         col.insert({'seg':doc.chinese}) 
 
-def generate(source='articles/cnBeta'):
+def generate(source='articles/cnbeta'):
     'combines cleaner and segmenter'
     import cleaner, segmenter
     
@@ -50,4 +53,4 @@ def generate(source='articles/cnBeta'):
     return documents
 
 if __name__ == '__main__':
-    generate('tweets/tweets')
+    generate('articles/cnbeta')

@@ -17,6 +17,14 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 
+# CONSTANTS
+DB = '176.34.54.120:27017'
+SOURCE_URL = 'http://ben304.sinaapp.com/zhihu-read.php'
+SOURCE_NAME = 'zhihu'.strip().lower()
+LIMIT = 1000
+GOOGLE_REQUEST_URL = 'http://www.google.com/reader/atom/feed/%s?n=%s'
+
+
 # Google OAuth
 SCOPE = "http://www.google.com/reader/api http://www.google.com/reader/atom"
 REQUEST_OAUTH_TOKEN_URL = "https://www.google.com/accounts/OAuthGetRequestToken?scope=%s" % SCOPE
@@ -32,7 +40,7 @@ def store_feeds(feeds, collection):
     from pymongo.errors import CollectionInvalid
     from pymongo.collection import Collection
     from pymongo.connection import Connection
-    con = Connection('localhost', 27017)
+    con = Connection(DB)
     from pymongo.database import Database
     db = Database(con, 'articles')
 
@@ -147,18 +155,15 @@ def retrieve_data(url, limit):
 
     # unlimited access to a provider's historical feeds
     # courtesy of google
-    url = "http://www.google.com/reader/atom/feed/%s?n=%s" % (url, limit)
+    url = GOOGLE_REQUEST_URL % (url, limit)
     response, feeds = client.request(url, 'GET')
     return feeds
 
 def main():
     'entrance to feeds retrieval and storing'
-    host = 'http://www.cnbeta.com/backend.php'
-    host_name = 'cnBeta'.strip().lower()
-    limit = 1000
-    data = retrieve_data(host, limit)
-    feeds = parse_feeds(data, limit)
-    store_feeds(feeds, host_name)
+    data = retrieve_data(SOURCE_URL, LIMIT)
+    feeds = parse_feeds(data, LIMIT)
+    store_feeds(feeds, SOURCE_NAME)
 
 if __name__ == '__main__':
     main()

@@ -17,15 +17,13 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-DOCUMENT_PATH = '/Users/Yuan/Downloads/socrates/extractor'
 # Database Configuration
-DB = {'host':'localhost', 'port':27017}
-MICRO_BLOGS = ['tweets', 'weibo']
+DB = ('176.34.54.120', 27017) 
+MICRO_BLOGS = ['twitter', 'weibo']
 NEWS_SOURCES = ['cnbeta', 'songshuhui', 'hacker news']
 
 def clean(source='articles/cnBeta'):
     'collect, rearrange and filter information'
-    sys.path.append(DOCUMENT_PATH)
     import media
     doc_type = media.Document()
     source = source.strip().lower()
