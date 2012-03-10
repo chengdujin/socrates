@@ -44,7 +44,3 @@
    3）题目
    4）来源/链接
    5）分类
-
-5. 微博主题/兴趣提取（interest_extractor.py）
-   1) TF/IDF or TextRank
-   2) Ranker
