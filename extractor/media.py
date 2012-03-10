@@ -17,7 +17,7 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-DB = ('176.34.54.120', 27017)
+DB = '176.34.54.120:27017'
 
 class Document(object):
     'parent class of all source classes'
@@ -116,7 +116,7 @@ class Twitter(Document):
            3. collect hashtags
            4. remove emotion words
            5. separate chinese and english'''
-        
+        sys.path.append('../libs/twitter-text-python/build/lib') 
         import ttp, HTMLParser
 	tweet = Tweet(doc['id'])
         tweet.published = doc['created_at']            

@@ -18,7 +18,8 @@ sys.setdefaultencoding('UTF-8')
 
 
 # CONSTANTS
-DB = ('176.34.54.120', 27017)
+DB = '176.34.54.120:27017'
+INPUT = 'twitter/mijia'
 
 def publish(docs, source):
     'leave a mark in database'
@@ -53,4 +54,4 @@ def generate(source='articles/cnbeta'):
     return documents
 
 if __name__ == '__main__':
-    generate('articles/cnbeta')
+    generate(INPUT)
