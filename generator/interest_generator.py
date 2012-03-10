@@ -18,7 +18,7 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-SOURCE = 'twitter/perryhau.chinese'
+SOURCE = 'twitter/chengdujin.chinese'
 DB = '176.34.54.120:27017'
 
 TOPIC_NUMBER = 20
@@ -46,7 +46,7 @@ def publish(docs, vocabs, data):
     for word_vocab_id in vocab_topic:
 	vt = vocab_topic[word_vocab_id]
         sorted_vt = OrderedDict(sorted(vt.items(), key=lambda x: -x[1]))
-        for svt, k, v in enumerate(sorted_vt):
+        for svt, (k, v) in enumerate(sorted_vt.items()):
 	    if svt > 3:
 		break
 	    else:
@@ -66,10 +66,10 @@ def publish(docs, vocabs, data):
     # combine topic-vocab with index_vocab to create a topic_id --> vocabulary list map
     topic_word = {}
     for topic_id in topic_vocab:
-	topic_word = ''
+	topic_word[topic_id] = ''
 	tv = topic_vocab[topic_id]
 	sorted_tv = OrderedDict(sorted(tv.items(), key=lambda x: -x[1]))
-	for stv, k, v in enumerate(sorted_tv):
+	for stv, (k, v) in enumerate(sorted_tv.items()):
 	    if stv > 3:
 		break
 	    else:
@@ -77,16 +77,18 @@ def publish(docs, vocabs, data):
 
     # publish
     for doc_id, doc in enumerate(docs):
-	topic_list = doc_topic[doc_id]
-        sorted_topic_list =  OrderedDict(sorted(topic_list.items(), key=lambda x: -x[1]))
-	wanted_strings = []
-        for stl, k, v in enumerate(sorted_topic_list.items()):
-            if stl > 3:
-		break
-	    else:
-	        wanted_strings.append(topic_word[k])
-	print ','.join(doc)
-	print ' '.join(wanted_strings)
+	if doc_id in doc_topic and len(doc) > 2:
+	    topic_list = doc_topic[doc_id]
+            sorted_topic_list =  OrderedDict(sorted(topic_list.items(), key=lambda x: -x[1]))
+	    wanted_strings = []
+            for stl, (k, v) in enumerate(sorted_topic_list.items()):
+                if stl > 3:
+		    break
+	        else:
+	            wanted_strings.append(topic_word[k])
+	    print str(doc_id + 1) + '.' +  ','.join(doc)
+	    print '>> ' + ' '.join(wanted_strings)
+	    print
 
 def learn(vocabs, data):
     'lda implementation'
@@ -123,9 +125,18 @@ def learn(vocabs, data):
 			break	
 
 		# add back new estimated value
-		vocab_topic[word_vocab_id][topic] += 1
-                doc_topic[doc_id][topic] += 1
-                topics[topic] += 1        
+		if not topic in vocab_topic[word_vocab_id]:
+		    vocab_topic[word_vocab_id][topic] = 1
+		else:
+		    vocab_topic[word_vocab_id][topic] += 1
+		if not topic in doc_topic[doc_id]:
+                    doc_topic[doc_id][topic] = 1
+		else:
+		    doc_topic[doc_id][topic] += 1
+		if not topic in topics:
+		    topics[topic] = 1
+		else:
+                    topics[topic] += 1        
                 documents[doc_id] += 1	
 		doc_vocab[doc_id][word_vocab_id] = topic
 
@@ -174,7 +185,7 @@ def initialize(docs, vocabs):
 	    doc_topic[doc_id] = dt
             
 	    # build topic
-	    if not rand_topic in topic:
+	    if not rand_topic in topics:
 		topics[rand_topic] = 1
 	    else:
 		topics[rand_topic] += 1
