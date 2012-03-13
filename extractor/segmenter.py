@@ -45,23 +45,23 @@ def segment(collection):
                     con = httplib.HTTPConnection(WEB_SERVICE_HOST)
                     con.request("GET", WEB_SERVICE_SEG % old_chinese)
                     web_data = con.getresponse().read().split(' ')[1:]
-  		    con.close()
+  		            con.close()
                     new_chinese = []
                 
                     for segment in web_data:
-	                segment = segment.strip()
+	                    segment = segment.strip()
                         if segment and not segment in UNWANTED:
                             # duplicated words should be tolerated
-		            if segment.isalpha():
+		                    if segment.isalpha():
                                 item.latin.append(segment.decode('utf-8'))
                             else:
                                 new_chinese.append(segment.decode('utf-8'))
-		    if new_chinese:
-	                item.chinese = new_chinese
-		        print str(id + 1), ','.join(new_chinese)
-		except Exception as e:
-		    print e 
-		    continue
+		            if new_chinese:
+	                    item.chinese = new_chinese
+		            print str(id + 1), ','.join(new_chinese)
+		        except Exception as e:
+		            print e 
+		            continue
     return collection
 
 if __name__ == '__main__':

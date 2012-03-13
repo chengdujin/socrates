@@ -27,20 +27,14 @@ def publish(docs, source):
     database = source_info[0]
     collection = source_info[1]
 
-    from pymongo.errors import CollectionInvalid
     from pymongo.connection import Connection
     con = Connection(DB)
     from pymongo.database import Database
     db = Database(con, database)
     from pymongo.collection import Collection
-    new_collection = collection + '.chinese'
-    col = None
-    try:
-        col = db.create_collection(new_collection)
-    except CollectionInvalid as e:
-        col = Collection(db, new_collection)
+    col = Collection(db, collection)
     for doc in docs:
-        col.insert({'seg':doc.chinese}) 
+        col.update({'source':doc.source}, {'$set':{'chinese':doc.chinese}}) 
 
 def generate(source='articles/cnbeta'):
     'combines cleaner and segmenter'

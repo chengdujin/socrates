@@ -7,7 +7,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.07
-# @latest 2012.03.08
+# @latest 2012.03.13
 #
 
 
@@ -26,9 +26,9 @@ class Document(object):
 
     def collect_data(self, database):
         'read out unicode data from mongodb'
-	from pymongo.connection import Connection
+	    from pymongo.connection import Connection
         con = Connection(DB)
-	from pymongo.database import Database
+	    from pymongo.database import Database
         db = Database(con, database['db']) 
         from pymongo.collection import Collection
         col = Collection(db, database['collection'])
@@ -40,14 +40,14 @@ class Document(object):
         cursor = col.find()
         if cursor.count() > 0:
             for entry in cursor:
-		doc = {}
+		        doc = {}
                 for key in entry.keys():
                     if screener and not key in screener:
-			doc[key] = entry[key]
-		    elif not screener:
-			doc[key] = entry[key]
-	        if doc:
-		    docs.append(doc)
+			            doc[key] = entry[key]
+		            elif not screener:
+			            doc[key] = entry[key]
+	                    if doc:
+		                    docs.append(doc)
 	    return docs
 	else:
 	    return Exception("[error] read_databse: nothing is found!")
@@ -70,34 +70,12 @@ class Document(object):
             word = (word.encode('utf-8')).translate(trans_table).strip()
             if word.isalpha():
                 # then it is composed of alphabets, francais?
-		if len(word) > 2: # no need to keep a word with a length less than 3 letters
+		        if len(word) > 2: # no need to keep a word with a length less than 3 letters
                     latin.append(word.decode('utf-8'))
-            else: # japanaese?
-                chinese.append(word.decode('utf-8'))
+                else: # japanaese?
+                    chinese.append(word.decode('utf-8'))
 
         return chinese, latin
-
-
-class News(Document):
-    'class that deals with news sources mainly collected from rss via google reader'
-    def __init__(self):
-        pass
-
-    def collect_data(self, database):
-        return super(News, self).collect_data(database)
-
-    def build_model(self, doc):
-        article = Article() 
-        article.author = doc['author']
-        article.title = doc['title']
-        article.published = doc['published']
-        article.source = doc['source']
-        article.category = doc['category']
- 
-        chinese, latin = super(News, self).separate_languages(doc['title'])
-        article.chinese = chinese
-        article.latin = latin
-        return article
 
 
 class Twitter(Document):
@@ -118,7 +96,7 @@ class Twitter(Document):
            5. separate chinese and english'''
         sys.path.append('../libs/twitter-text-python/build/lib') 
         import ttp, HTMLParser
-	tweet = Tweet(doc['id'])
+	    tweet = Tweet(doc['id'])
         tweet.published = doc['created_at']            
         tweet.source = HTMLParser.HTMLParser().unescape(doc['source'])
         tweet.retweeted = doc['retweet_count']
@@ -154,10 +132,32 @@ class Twitter(Document):
         return tweet
 
 
+class News(Document):
+    'class that deals with news sources mainly collected from rss via google reader'
+    def __init__(self):
+        pass
+
+    def collect_data(self, database):
+        return super(News, self).collect_data(database)
+
+    def build_model(self, doc):
+        article = Article() 
+        article.author = doc['author']
+        article.title = doc['title']
+        article.published = doc['published']
+        article.source = doc['source']
+        article.category = doc['category']
+ 
+        chinese, latin = super(News, self).separate_languages(doc['title'])
+        article.chinese = chinese
+        article.latin = latin
+        return article
+
+
 class Article():
     ''
     def __init__(self, author = None, title = None, published = None, source = None, category = None):
-	self.author = author
+	    self.author = author
         self.title = title
         self.published = published
         self.source = source
