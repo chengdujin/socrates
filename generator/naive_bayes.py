@@ -25,70 +25,80 @@ class NaiveBayes(object):
         'disect the docs into dataset: labels and doc'
         self.label_priors = {}
         self.label_cond_prob = {}
-	self.docs = docs
+        self.docs = docs
 
     def train(self):
-	'calculate the priors and conditional probabilities'
-	for doc in self.docs:
-	    category = doc.category
+	    'calculate the priors and conditional probabilities'
+	    for doc in self.docs:
+	        category = doc.category
             chinese = doc.chinese
 
-	    for label in category:
-		# compute the priors
-		if label in self.label_priors:
-		    self.label_priors[label] += 1
-		else:
-		    self.label_priors[label] = 1
-		    self.label_cond_prob[label] = {}
+            for label in category:
+		        # compute the priors
+		        if label in self.label_priors:
+		            self.label_priors[label] += 1
+		        else:
+		            self.label_priors[label] = 1
+		            self.label_cond_prob[label] = {}
 		
-	    	# compute the conditional probabilities
-		for word in chinese:
-		    if not word in self.label_cond_prob[label]: 
-			self.label_cond_prob[label][word] = 1
-		    else:
-			self.label_cond_prob[label][word] += 1 		
+	    	    # compute the conditional probabilities
+		        for word in chinese:
+		            if not word in self.label_cond_prob[label]: 
+			            self.label_cond_prob[label][word] = 1
+		            else:
+			            self.label_cond_prob[label][word] += 1 		
 
-    def valuate(self, label):
+    def valuate_pl(self, label):
         'calculate p(l)'
-	pl = self.label_priors[label] / len(self.label_priors)
-	return pl
+        pl = float(self.label_priors[label]) / float(len(self.label_priors))
+        return pl
 
-    def valuate(self, doc, label):
-	'calculate p(d|l)'
+    def valuate_pdl(self, doc, label):
+        'calculate p(d|l)'
         pdl = 1 
         for word in doc:
-            if word in self.label_cond_prob[label]:
-                pdl *= label[word] / self.label_priors[label]
+            if word in self.label_cond_prob[label] and word in self.label_priors:
+                pdl *= float(self.label_cond_prob[label][word]) / float(self.label_priors[word])
             else:
-                pdl *= 1 / (len(self.docs) + 1)
-        pdl = (pdf == 1) ? (1 / len(self.label_priors) : pdl)
-        return pdl 
+                pdl *= 1 / float((len(self.docs) + 1))
+        if pdl == 1: 
+            return 1 / float(len(self.label_priors))
+        else: 
+            return pdl
 
     def valuate(self, label, doc):
         'return the probability of doc with the label'
         'calculate p(d|l) * p(l) / p(d)'
-	# p(d|l); doc should be presented as doc.chinese, e.g.
-        pdl = self.valuate(doc, label)
+	    # p(d|l); doc should be presented as doc.chinese, e.g.
+        pdl = self.valuate_pdl(doc, label)
 
-	# p(l)
-        pl = self.valuate(label)
+	    # p(l)
+        pl = self.valuate_pl(label)
 
-	# pd
+	    # pd
         pd = 0	 
         for tag in self.label_priors:
-	    pd += self.valuate(doc, tag) * self.valuate(tag)
-        pd = (pd == 0) ? (1 / len(self.label_priors)) : pd
+	        pd += float(self.valuate_pdl(doc, tag)) * float(self.valuate_pl(tag))
+        if pd == 0:
+            pd = 1 / float(len(self.label_priors)) 
 
-        return (pdl * pl) / pd 
+        return float((pdl * pl) / pd) 
 
     def classify(self, doc):
-	'classify a file based on the trained model'
-	best = 0
-	for label in self.label_cond_prob:
-	     prob = self.valuate(label, doc)
-	     if prob > best:
-		best = prob
-	return best
+        'classify a file based on the trained model'
+        best = 0
+        guess = ''
+        for label in self.label_cond_prob:
+            prob = self.valuate(label, doc.chinese)
+            if prob > best:
+                best = prob
+                guess = label
+	    
+        # publish
+        print doc.title
+        print ','.join(doc.category)
+        print guess
+        print
 
 def read_and_structure():
     'read data from mongodb and structure them for the classification'
@@ -103,42 +113,50 @@ def read_and_structure():
     def restructure(category):
         new_category = []
         for item in category:
-	    if not item.strip():
-		continue
-	    else:
-		if '/' in item:
-		    splits = item.split('/')
-		    for split in splits:
-			if split:
-			    new_category.append(split.strip())
-		else:
-		    new_category.append(item.strip())
-	return new_category
+	        if not item.strip():
+		        continue
+	        else:
+		        if '/' in item:
+		            splits = item.split('/')
+		            for split in splits:
+			            if split:
+			                new_category.append(split.strip())
+		        else:
+		            new_category.append(item.strip())
+        return new_category
 
     from pymongo.collection import Collection
     collections = db.collection_names()
     articles = []
     for col in collections:
-	if col <> 'system.indexes':
+        if col <> 'system.indexes':
             collection = Collection(db, col)
             cursor = collection.find()
             for entry in cursor:
-	        article = Article()
-	        article.title = entry['title']
-		article.published = entry['published']
-		article.source = entry['source']
-		article.category = restructure(entry['category'])
-		artcile.chinese = entry['chinese']
-		artcile.latin = entry['latin'] 
-	    articles.append(article)
+                article = media.Article()
+                article.title = entry['title']
+                article.published = entry['published']
+                article.source = entry['source']
+                article.category = restructure(entry['category'])
+                article.chinese = entry['chinese']
+                articles.append(article)
     return articles
    
 def main():
-sh -i socrates.pem ec2-user@176.34.54.120   'main entrance to read data from db, train and classify'
-    article = read_and_structure()
-    nb = NaiveBayes(articles)
-    #nb.train()
-    #nb.classify()
+    'main entrance to read data from db, train and classify'
+    articles = read_and_structure()
+    training_size = int(len(articles) * 0.8)
+    training = []
+    for id in range(training_size):
+        training.append(articles.pop())
+
+    # naive bayes training
+    nb = NaiveBayes(training)
+    nb.train()
+    
+    # testing
+    for article in articles:
+        nb.classify(article)
 
 if __name__ == "__main__":
     main()
