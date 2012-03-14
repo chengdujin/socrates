@@ -28,12 +28,13 @@ class NaiveBayes(object):
         self.docs = docs
 
     def train(self):
-	    'calculate the priors and conditional probabilities'
-	    for doc in self.docs:
-	        category = doc.category
+        'calculate the priors and conditional probabilities'
+        for doc in self.docs:
+            category = doc.category
             chinese = doc.chinese
+            segments = category + chinese
 
-            for label in category:
+            for label in segments:
 		        # compute the priors
 		        if label in self.label_priors:
 		            self.label_priors[label] += 1
@@ -76,28 +77,34 @@ class NaiveBayes(object):
         pl = self.valuate_pl(label)
 
 	    # pd
-        pd = 0	 
+        '''pd = 0	 
         for tag in self.label_priors:
-	        pd += float(self.valuate_pdl(doc, tag)) * float(self.valuate_pl(tag))
+            pd += float(self.valuate_pdl(doc, tag)) * float(self.valuate_pl(tag))
         if pd == 0:
             pd = 1 / float(len(self.label_priors)) 
-
-        return float((pdl * pl) / pd) 
+        '''
+        return (pdl * pl) 
 
     def classify(self, doc):
         'classify a file based on the trained model'
         best = 0
         guess = ''
+        second_guess = ''
+        third_guess = ''
+        fourth_guess = ''
         for label in self.label_cond_prob:
             prob = self.valuate(label, doc.chinese)
             if prob > best:
                 best = prob
+                fourth_guess = third_guess
+                third_guess = second_guess
+                second_guess = guess
                 guess = label
 	    
         # publish
         print doc.title
         print ','.join(doc.category)
-        print guess
+        print second_guess, third_guess, fourth_guess
         print
 
 def read_and_structure():
@@ -145,10 +152,11 @@ def read_and_structure():
 def main():
     'main entrance to read data from db, train and classify'
     articles = read_and_structure()
-    training_size = int(len(articles) * 0.8)
+    training_size = int(len(articles) * 0.9)
     training = []
     for id in range(training_size):
-        training.append(articles.pop())
+        article = articles.pop()
+        training.append(article)
 
     # naive bayes training
     nb = NaiveBayes(training)
