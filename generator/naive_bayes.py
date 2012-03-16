@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 ##
-# this script serves to train articles
+# this script serves to train articles, and 
+# classify a new article
 #
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
