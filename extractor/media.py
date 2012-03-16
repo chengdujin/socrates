@@ -164,6 +164,8 @@ class Article():
         self.source = source
         self.category = []
         
+        # labels are classified category information
+        self.labels = []
         self.chinese = []
         self.latin = []
         

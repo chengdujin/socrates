@@ -11,15 +11,6 @@
 # @latest 2012.03.13
 #
 
-# reload the script encoding
-import sys
-reload(sys)
-sys.setdefaultencoding('UTF-8')
-
-# CONSTANTS
-DB = '176.34.54.120:27017'
-database = 'articles'
-
 
 class NaiveBayes(object):
     def __init__(self, docs):
@@ -107,65 +98,6 @@ class NaiveBayes(object):
         print ','.join(doc.category)
         print second_guess, third_guess, fourth_guess
         print
-
-def read_and_structure():
-    'read data from mongodb and structure them for the classification'
-    sys.path.append('../extractor/')
-    import media
-
-    from pymongo.connection import Connection
-    con = Connection(DB)
-    from pymongo.database import Database
-    db = Database(con, database)
-    
-    def restructure(category):
-        new_category = []
-        for item in category:
-	        if not item.strip():
-		        continue
-	        else:
-		        if '/' in item:
-		            splits = item.split('/')
-		            for split in splits:
-			            if split:
-			                new_category.append(split.strip())
-		        else:
-		            new_category.append(item.strip())
-        return new_category
-
-    from pymongo.collection import Collection
-    collections = db.collection_names()
-    articles = []
-    for col in collections:
-        if col <> 'system.indexes':
-            collection = Collection(db, col)
-            cursor = collection.find()
-            for entry in cursor:
-                article = media.Article()
-                article.title = entry['title']
-                article.published = entry['published']
-                article.source = entry['source']
-                article.category = restructure(entry['category'])
-                article.chinese = entry['chinese']
-                articles.append(article)
-    return articles
    
-def main():
-    'main entrance to read data from db, train and classify'
-    articles = read_and_structure()
-    training_size = int(len(articles) * 0.9)
-    training = []
-    for id in range(training_size):
-        article = articles.pop()
-        training.append(article)
-
-    # naive bayes training
-    nb = NaiveBayes(training)
-    nb.train()
-    
-    # testing
-    for article in articles:
-        nb.classify(article)
-
 if __name__ == "__main__":
-    main()
+    pass

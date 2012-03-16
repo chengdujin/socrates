@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.15
-# @latest 2012.03.15
+# @latest 2012.03.16
 #
 
 # reload the script encoding
@@ -29,7 +29,23 @@ class KMeans(object):
     def __init__(self, k=None, points):
         self.k = k
         self.points = points
-        self.centroids = self.init_centroid(points, k)
+        self.centroids = self.init_centroids(points, k)
+
+    def init_centroids(self, points, limit):
+        'pick the inital centroids among the data points'
+        'the candidates should be stored in self.centroids'
+        import random
+        centroids = []
+        weighted_points = {}
+        for point in points:
+            weight = random.random() * 10000
+            weighted_points[point] = weight
+
+        # sort out limit number of candidate centroids
+        weighted_points = sorted(weighted_points.items(), key=lambda d: -d[1])
+        for i in range(limit):
+            centroids.append(weighted_points.keys()[i])
+        return centroids
 
     def distance(self, centroid, point):
         'calculate the distance between the two points'
@@ -65,22 +81,6 @@ class KMeans(object):
                 centroid_candidate = point
         return centroid_candidate
     
-    def init_centroids(self, points, limit):
-        'pick the inital centroids among the data points'
-        'the candidates should be stored in self.centroids'
-        import random
-        centroids = []
-        weighted_points = {}
-        for point in points:
-            weight = random.random() * 10000
-            weighted_points[pint] = weight
-
-        # sort out limit number of candidate centroids
-        weighted_points = sorted(weighted_points.items(), key=lambda d: -d[1])
-        for i in range(limit):
-            centroids.append(weighted_points.keys()[i])
-        return centroids
-
     def cluster(self):
         ''
         # array of Cluster instances
