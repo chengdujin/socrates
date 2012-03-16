@@ -26,10 +26,11 @@ class Cluster(object):
 
 class KMeans(object):
     'a simple implementation of k-means algorithm'
-    def __init__(self, k=None, points):
+    def __init__(self, points, k=None):
         self.k = k
         self.points = points
         self.centroids = self.init_centroids(points, k)
+        self.clusters = []
 
     def init_centroids(self, points, limit):
         'pick the inital centroids among the data points'
@@ -119,6 +120,7 @@ class KMeans(object):
                         clusters.append(new_cluster)
                     else:
                         clusters.append(old_cluster)
+        self.clusters = clusters
 
 if __name__ == '__main__':
     'test ground'

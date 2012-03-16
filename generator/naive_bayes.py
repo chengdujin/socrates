@@ -77,27 +77,37 @@ class NaiveBayes(object):
         '''
         return (pdl * pl) 
 
-    def classify(self, doc):
+    def classify(self, doc, threshold):
         'classify a file based on the trained model'
+        'threshold says the confidence should be above some level'
         best = 0
-        guess = ''
+        first_guess = ''
         second_guess = ''
         third_guess = ''
         fourth_guess = ''
+        fifth_guess = ''
         for label in self.label_cond_prob:
             prob = self.valuate(label, doc.chinese)
-            if prob > best:
+            if prob > threshold and prob > best:
                 best = prob
+                fifth_guess = fourth_guess
                 fourth_guess = third_guess
                 third_guess = second_guess
                 second_guess = guess
-                guess = label
+                first_guess = label
 	    
         # publish
-        print doc.title
-        print ','.join(doc.category)
-        print second_guess, third_guess, fourth_guess
-        print
-   
+        if first_guess:
+            doc.labels.append(first_guess)
+            if second_guess:
+                doc.labels.append(second_guess)
+                if third_guess:
+                    doc.labels.append(third_guess)
+                    if fourth_guess:
+                        doc.labels.append(fourth_guess)
+                        if fifth_guess:
+                            doc.labels.append(fifth_guess)
+        return doc  
+ 
 if __name__ == "__main__":
     pass
