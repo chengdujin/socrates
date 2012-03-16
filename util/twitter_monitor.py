@@ -10,6 +10,10 @@
 # @since 2012.03.02
 # @latest 2012.03.02
 
+# reload the script encoding
+import sys
+reload(sys)
+sys.setdefaultencoding('UTF-8')
 
 def publish_candidates(user, candidates):
     'work with wordpress xml-rpc apis'
@@ -60,7 +64,7 @@ def orthodoxize_time(time_piece, time_format):
 def analyze_tweets(tweets):
     'keep what is necessary'
     first_candidates = []
-    sys.path.append("/Users/Yuan/Downloads/socrates/libs/tweetmotif/")
+    sys.path.append("../libs/tweetmotif/")
     import twokenize
 
     for tweet in tweets:
