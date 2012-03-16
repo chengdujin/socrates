@@ -24,7 +24,7 @@ class NaiveBayes(object):
         for doc in self.docs:
             category = doc.category
             chinese = doc.chinese
-            segments = category + chinese
+            segments = set(category + chinese)
 
             for label in segments:
 		        # compute the priors
@@ -35,7 +35,7 @@ class NaiveBayes(object):
 		            self.label_cond_prob[label] = {}
 		
 	    	    # compute the conditional probabilities
-		        for word in chinese:
+		        for word in segments:
 		            if not word in self.label_cond_prob[label]: 
 			            self.label_cond_prob[label][word] = 1
 		            else:
@@ -51,9 +51,9 @@ class NaiveBayes(object):
         pdl = 1 
         for word in doc:
             if word in self.label_cond_prob[label] and word in self.label_priors:
-                pdl *= float(self.label_cond_prob[label][word]) / float(self.label_priors[word])
+                pdl += float(self.label_cond_prob[label][word]) / float(self.label_priors[word])
             else:
-                pdl *= 1 / float((len(self.docs) + 1))
+                pdl += 1 / float((len(self.docs) + 1))
         if pdl == 1: 
             return 1 / float(len(self.label_priors))
         else: 
@@ -67,7 +67,7 @@ class NaiveBayes(object):
 
 	    # p(l)
         pl = self.valuate_pl(label)
-
+        
 	    # pd
         '''pd = 0	 
         for tag in self.label_priors:
@@ -77,7 +77,7 @@ class NaiveBayes(object):
         '''
         return (pdl * pl) 
 
-    def classify(self, doc, threshold):
+    def classify(self, doc):
         'classify a file based on the trained model'
         'threshold says the confidence should be above some level'
         best = 0
@@ -86,14 +86,14 @@ class NaiveBayes(object):
         third_guess = ''
         fourth_guess = ''
         fifth_guess = ''
-        for label in self.label_cond_prob:
+        for label in self.label_priors:
             prob = self.valuate(label, doc.chinese)
-            if prob > threshold and prob > best:
+            if prob > best:
                 best = prob
                 fifth_guess = fourth_guess
                 fourth_guess = third_guess
                 third_guess = second_guess
-                second_guess = guess
+                second_guess = first_guess
                 first_guess = label
 	    
         # publish
@@ -107,6 +107,7 @@ class NaiveBayes(object):
                         doc.labels.append(fourth_guess)
                         if fifth_guess:
                             doc.labels.append(fifth_guess)
+        
         return doc  
  
 if __name__ == "__main__":

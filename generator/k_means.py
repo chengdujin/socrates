@@ -36,6 +36,7 @@ class KMeans(object):
         'pick the inital centroids among the data points'
         'the candidates should be stored in self.centroids'
         import random
+        from collections import OrderedDict
         centroids = []
         weighted_points = {}
         for point in points:
@@ -43,7 +44,7 @@ class KMeans(object):
             weighted_points[point] = weight
 
         # sort out limit number of candidate centroids
-        weighted_points = sorted(weighted_points.items(), key=lambda d: -d[1])
+        weighted_points = OrderedDict(sorted(weighted_points.items(), key=lambda d: -d[1]))
         for i in range(limit):
             centroids.append(weighted_points.keys()[i])
         return centroids
@@ -51,7 +52,7 @@ class KMeans(object):
     def distance(self, centroid, point):
         'calculate the distance between the two points'
         intersect = set(centroid.labels) & set(point.labels)
-        return float(len(intersect) / len(point))
+        return float(len(intersect) / (len(point.labels) + 1))
 
     def find_closest_centroid(self, point):
         'find the closest centroid by distance'
@@ -66,17 +67,17 @@ class KMeans(object):
 
     def find_centroid(self, cluster):
         'find the centroid within a cluster'
-        minimum_total_dist = len(cluster) - 1
+        minimum_total_dist = len(cluster.points) - 1
         centroid_candidate = None
         for point in cluster.points:
             total_dist = 0
-            a = len(point.labels)
+            a = point.labels
             # compare with other points
-            for other in cluster:
+            for other in cluster.points:
                 if point <> other:
-                    b = len(other.labels)
+                    b = other.labels
                     intersect = set(a) & set(b)
-                    total_dist += (float(len(intersect)) / float(len(other.labels)))
+                    total_dist += (float(len(intersect)) / float(len(other.labels) + 1))
             if total_dist < minimum_total_dist:
                 minimum_total_dist = total_dist
                 centroid_candidate = point
@@ -110,9 +111,9 @@ class KMeans(object):
             old_clusters = clusters
             clusters = []
             for old_cluster in old_clusters:
-                if len(old_cluster):
+                if len(old_cluster.points):
                     # old_cluster is an instance of Cluster
-                    new_centroid = find_centroid(old_cluster)
+                    new_centroid = self.find_centroid(old_cluster)
                     if new_centroid <> old_cluster.centroid:
                         centroid_changed = True
                         new_cluster = Cluster()

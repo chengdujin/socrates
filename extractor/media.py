@@ -143,15 +143,21 @@ class News(Document):
 
     def build_model(self, doc):
         article = Article() 
-        article.author = doc['author']
-        article.title = doc['title']
-        article.published = doc['published']
-        article.source = doc['source']
-        article.category = doc['category']
- 
-        chinese, latin = super(News, self).separate_languages(doc['title'])
-        article.chinese = chinese
-        article.latin = latin
+        if 'author' in doc:
+            article.author = doc['author']
+        if 'title' in doc:
+            article.title = doc['title']
+        if 'published' in doc:
+            article.published = doc['published']
+        if 'source' in doc:
+            article.source = doc['source']
+        if 'category' in doc:
+            article.category = doc['category']
+    
+        if 'title' in doc:
+            chinese, latin = super(News, self).separate_languages(doc['title'])
+            article.chinese = chinese
+            article.latin = latin
         return article
 
 

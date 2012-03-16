@@ -61,13 +61,14 @@ def read_and_structure():
                 article.source = entry['source']
                 article.category = restructure(entry['category'])
                 article.chinese = entry['chinese']
-                articles.append(article)
+                if article.chinese:
+                    articles.append(article)
     return articles
 
 def main():
     'read the data, train the classifier and cluster them'
     # read from data source
-    articles = read _and_structure()
+    articles = read_and_structure()
 
     # separate training articles and testing ones
     training_size = int(len(articles) * 0.95)
@@ -81,15 +82,18 @@ def main():
     nb = naive_bayes.NaiveBayes(training)
     nb.train()
 
-    for article in articles:
+    '''for article in articles:
         # article will be classified with a lables
         nb.classify(article)
-
+        print article.title
+        print ','.join(article.labels)
+        print
+    '''
     # cluster
     import k_means
     km = k_means.KMeans(articles, 3)
     km.cluster()
-
+    '''
     # publish
     for cluster in km.clusters:
         centroid = cluster.centroid
@@ -99,6 +103,6 @@ def main():
         for id, point in enumerate(cluster.points):
             print '    %s. ' % str(id + 1), point.title
         print
-
+    '''
 if __name__ == "__main__":
     main()
