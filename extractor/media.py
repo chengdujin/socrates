@@ -97,38 +97,47 @@ class Twitter(Document):
         sys.path.append('../libs/twitter-text-python/build/lib') 
         import ttp, HTMLParser
         
-        tweet = Tweet(doc['id'])
-        tweet.published = doc['created_at']            
-        tweet.source = HTMLParser.HTMLParser().unescape(doc['source'])
-        tweet.retweeted = doc['retweet_count']
-        tweet.favorited = doc['favorited']
+        tweet = Tweet()
+        if 'id_' in doc:
+            tweet.id_ = doc['id_']
+        if '_id' in doc:
+            tweet._id = doc['_id']
+        if 'created_at' in doc:
+            tweet.published = doc['created_at']            
+        if 'source' in doc:
+            tweet.source = HTMLParser.HTMLParser().unescape(doc['source'])
+        if 'retweet_count' in doc:
+            tweet.retweeted = doc['retweet_count']
+        if 'favorited' in doc:
+            tweet.favorited = doc['favorited']
 
-        text = HTMLParser.HTMLParser().unescape(doc['text'])
-        tweet.text = text
-        parsed_text = ttp.Parser().parse(text)
+        if 'text' in doc:
+            text = HTMLParser.HTMLParser().unescape(doc['text'])
+            tweet.text = text
+            parsed_text = ttp.Parser().parse(text)
 
-        # tweet replied users
-        tweet.users = parsed_text.users
-        for user in tweet.users:
-            user = u'@%s' % user
-            if user in text:
-                text =  text.replace(user, '') 
-        # tweet hashtags
-        tweet.hashtags = parsed_text.tags
-        for hashtag in tweet.hashtags:
-            hashtag = u'#%s' % hashtag
-            if hashtag in text:
-                text = text.replace(hashtag, '') 
-        # tweet urls
-        tweet.urls = parsed_text.urls
-        for url in tweet.urls:
-            if url in text:
-                text = text.replace(url, '') 
+            # tweet replied users
+            tweet.users = parsed_text.users
+            for user in tweet.users:
+                user = u'@%s' % user
+                if user in text:
+                    text =  text.replace(user, '') 
+            # tweet hashtags
+            tweet.hashtags = parsed_text.tags
+            for hashtag in tweet.hashtags:
+                hashtag = u'#%s' % hashtag
+                if hashtag in text:
+                    text = text.replace(hashtag, '') 
+            # tweet urls
+            tweet.urls = parsed_text.urls
+            for url in tweet.urls:
+                if url in text:
+                    text = text.replace(url, '') 
             
-        # separate chinese and latin, remove emotions and others 
-        chinese, latin = super(Twitter, self).separate_languages(text)
-        tweet.chinese = chinese
-        tweet.latin = latin
+            # separate chinese and latin, remove emotions and others 
+            chinese, latin = super(Twitter, self).separate_languages(text)
+            tweet.chinese = chinese
+            tweet.latin = latin
         
         return tweet
 
@@ -143,6 +152,8 @@ class News(Document):
 
     def build_model(self, doc):
         article = Article() 
+        if '_id' in doc:
+            article._id = doc['_id']
         if 'author' in doc:
             article.author = doc['author']
         if 'title' in doc:
@@ -163,7 +174,9 @@ class News(Document):
 
 class Article():
     ''
-    def __init__(self, author = None, title = None, published = None, source = None, category = None):
+    def __init__(self, _id = None, author = None, title = None, published = None, source = None, category = None):
+        # id_ - document id, which should be mapped to _id in mongodb
+        self._id = _id
         self.author = author
         self.title = title
         self.published = published
@@ -180,8 +193,11 @@ class Article():
 
 
 class Tweet:
-    def __init__(self, id_ = None, text = None, favorited = None, published = None, retweeted = None, source = None):
+    def __init__(self, id_ = None, _id = None, text = None, favorited = None, published = None, retweeted = None, source = None):
+        # id_ - twitter id, which, however, should be mapped to _id in mongodb, not twitter id
         self.id_ = id_
+        # mongodb id
+        self._id = _id
         self.text = text
         self.favorited = favorited
         self.published = published
@@ -199,3 +215,14 @@ class Tweet:
         
     def __str__(self):
         return 'keywords:\n' + str(self.keywords) + '\nchinese:\n' + str(self.chinese) + '\nlatin:\n' + str(self.latin) + '\nurls:\n' + str(self.urls) + '\nhashtags:\n' + str(self.hashtags) + '\nusers:\n' + str(self.users) + '\npublished:\n' + str(self.created_at) + '\nsource:\n' + str(self.source) + '\n'
+
+class Segment:
+    'class to model a segment, including chinese, japanase and english'
+    def __init__(self, doc):
+        self.word = ''
+        if 'word' in doc:
+            self.word = doc['word']
+        if 'count' in doc:
+            self.count = int(doc['count'])
+        if 'records' in doc: # records is a list
+            self.records = doc['records']

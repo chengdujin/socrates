@@ -44,48 +44,48 @@ def publish(docs, vocabs, data):
     # build topic-vocab map
     topic_vocab = {}
     for word_vocab_id in vocab_topic:
-	vt = vocab_topic[word_vocab_id]
+	    vt = vocab_topic[word_vocab_id]
         sorted_vt = OrderedDict(sorted(vt.items(), key=lambda x: -x[1]))
         for svt, (k, v) in enumerate(sorted_vt.items()):
-	    if svt > 3:
-		break
-	    else:
+	        if svt > 3:
+		        break
+	        else:
                 if not k in topic_vocab:
-		    vocab_list = {}
-		    vocab_list[word_vocab_id] = v
-		else:
-		    vocab_list = topic_vocab[k]
+		            vocab_list = {}
+		            vocab_list[word_vocab_id] = v
+		        else:
+		            vocab_list = topic_vocab[k]
 		    if word_vocab_id in vocab_list:
-			old_association = vocab_list[word_vocab_id]
-			if old_association < v:
-			    vocab_list[word_vocab_id] = v
-		    else:
-			vocab_list[word_vocab_id] = v
-		topic_vocab[k] = vocab_list
+			    old_association = vocab_list[word_vocab_id]
+			    if old_association < v:
+			        vocab_list[word_vocab_id] = v
+		        else:
+			        vocab_list[word_vocab_id] = v
+		    topic_vocab[k] = vocab_list
 
     # combine topic-vocab with index_vocab to create a topic_id --> vocabulary list map
     topic_word = {}
     for topic_id in topic_vocab:
-	topic_word[topic_id] = ''
-	tv = topic_vocab[topic_id]
-	sorted_tv = OrderedDict(sorted(tv.items(), key=lambda x: -x[1]))
-	for stv, (k, v) in enumerate(sorted_tv.items()):
-	    if stv > 3:
-		break
-	    else:
-		topic_word[topic_id] += index_vocab[k] + ',' 
+	    topic_word[topic_id] = ''
+	    tv = topic_vocab[topic_id]
+	    sorted_tv = OrderedDict(sorted(tv.items(), key=lambda x: -x[1]))
+	    for stv, (k, v) in enumerate(sorted_tv.items()):
+	        if stv > 3:
+		        break
+	        else:
+		        topic_word[topic_id] += index_vocab[k] + ',' 
 
     # publish
     for doc_id, doc in enumerate(docs):
-	if doc_id in doc_topic and len(doc) > 2:
-	    topic_list = doc_topic[doc_id]
+	    if doc_id in doc_topic and len(doc) > 2:
+	        topic_list = doc_topic[doc_id]
             sorted_topic_list =  OrderedDict(sorted(topic_list.items(), key=lambda x: -x[1]))
-	    wanted_strings = []
+	        wanted_strings = []
             for stl, (k, v) in enumerate(sorted_topic_list.items()):
                 if stl > 3:
-		    break
-	        else:
-	            wanted_strings.append(topic_word[k])
+		            break
+	            else:
+	                wanted_strings.append(topic_word[k])
 	    print str(doc_id + 1) + '.' +  ','.join(doc)
 	    print '>> ' + ' '.join(wanted_strings)
 	    print
@@ -154,41 +154,41 @@ def initialize(docs, vocabs):
     for doc_id, doc in enumerate(docs):
         dc = {} 
         # build documents
-	documents[doc_id] = len(doc)
-	for word in doc:
-	    rand_topic = random.randint(1, TOPIC_NUMBER)
+	    documents[doc_id] = len(doc)
+	    for word in doc:
+	        rand_topic = random.randint(1, TOPIC_NUMBER)
             word_vocab_id = vocab_index[word]
-	    # build doc-vocab
+	        # build doc-vocab
             dc[word_vocab_id] = rand_topic
 
     	    # build vocab-topic
-	    if not word_vocab_id in vocab_topic:
-	        vt = {}
-		vt[rand_topic] = 1
-	    else:
-		vt = vocab_topic[word_vocab_id]
-		if rand_topic in vt:
+	        if not word_vocab_id in vocab_topic:
+	            vt = {}
+		        vt[rand_topic] = 1
+	        else:
+		        vt = vocab_topic[word_vocab_id]
+		    if rand_topic in vt:
 	            vt[rand_topic] += 1
-		else:
-		    vt[rand_topic] = 1
-            vocab_topic[word_vocab_id] = vt
+		    else:
+		        vt[rand_topic] = 1
+                vocab_topic[word_vocab_id] = vt
 
 	    # build doc-topic
 	    if not doc_id in doc_topic:
-		dt = {}
-		dt[rand_topic] = 1
-	    else:
-		if rand_topic in dt:
-		    dt[rand_topic] += 1
-    		else:
+		    dt = {}
 		    dt[rand_topic] = 1
+	    else:
+		    if rand_topic in dt:
+		        dt[rand_topic] += 1
+    		else:
+		        dt[rand_topic] = 1
 	    doc_topic[doc_id] = dt
             
 	    # build topic
 	    if not rand_topic in topics:
-		topics[rand_topic] = 1
+		    topics[rand_topic] = 1
 	    else:
-		topics[rand_topic] += 1
+		    topics[rand_topic] += 1
         doc_vocab[doc_id] = dc 
     
     return (doc_vocab, vocab_topic, doc_topic, topics, documents)
@@ -202,10 +202,10 @@ def vocab_indexer(docs):
 
     for doc in docs:
         for word in doc:
-	    if word not in vocab_index:     
-		index = len(index_vocab)
-		index_vocab.append(word)
-		vocab_index[word] = index
+	        if word not in vocab_index:     
+		        index = len(index_vocab)
+		        index_vocab.append(word)
+		        vocab_index[word] = index
     return (index_vocab, vocab_index)
 
 def prepare(docs):
@@ -229,13 +229,13 @@ def read(source):
 
     cursor = collection.find()
     if cursor.count() > 0:
-	docs = []
+	    docs = []
         for entry in cursor:
             if 'seg' in entry.keys():
-		docs.append(entry['seg'])
-	return docs
+		        docs.append(entry['seg'])
+	    return docs
     else:
-	return Exception("[error] read: nothing is found!")      
+	    return Exception("[error] read: nothing is found!")      
 
 def generate(source):
     '''

@@ -48,6 +48,7 @@ def clean(source='articles/cnBeta'):
     collection = []
     for doc in docs:
         if doc:
+            # item is media.Article or media.Tweet
             item = doc_type.build_model(doc)
             collection.append(item)
 

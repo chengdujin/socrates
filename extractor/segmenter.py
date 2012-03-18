@@ -34,7 +34,6 @@ UNWANTED = CHINESE_UNWANTED + ENGLSIH_UNWANTED
 def segment(collection):
     'segmentation based on fudannlp web services'
     'collection is a list of media.Tweet instances'
-    import media
 
     for id, item in enumerate(collection):
         if isinstance(item, media.Tweet) or isinstance(item, media.Article):
@@ -52,10 +51,11 @@ def segment(collection):
                         segment = segment.strip()
                         if segment and not segment in UNWANTED:
                             # duplicated words should be tolerated
-                            if segment.isalpha():
-                                item.latin.append(segment.decode('utf-8'))
+                            u_segment = segment.decode('utf-8')
+                            if segment.isalpha():   
+                                item.latin.append(u_segment)
                             else:
-                                new_chinese.append(segment.decode('utf-8'))
+                                new_chinese.append(u_segment)
                     if new_chinese:
                         item.chinese = new_chinese
                     print str(id + 1), ','.join(new_chinese)
