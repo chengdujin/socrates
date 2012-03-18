@@ -31,14 +31,18 @@ from pymongo.collection import Collection
 def persist_classified(article):
     'store the classified result in mongodb'
     col = Collection(db, CLASSIFIED)
-    from guess in article.labels:
+    for guess in article.labels:
         label = guess[0]
         probability = guess[1]
+
+        # check if the label is already stored
         cursor = col.find({'word':label})
         if cursor.count():
+            # should include at most on entry
             for entry in cursor:
                 # articles --> (article, probability) * n
                 articles = set(entry['articles'])
+                # one article indeed could have several probability values
                 articles.add((article, probability))
                 col.update({'word':label}, {"$set", {"articles":articles}})
         else: # a new label
@@ -91,7 +95,7 @@ def read_and_structure():
     return training, testing
 
 def main():
-    'read the data, train the classifier and cluster them'
+    'read the data, train the classifier and classify articles'
     # read from data source
     training, testing = read_and_structure()
 
@@ -100,25 +104,11 @@ def main():
     nb = naive_bayes.NaiveBayes(training)
     nb.train()
 
+    # classify
     for article in testing:
-        # article will be classified with a lables
+        # article will be classified with lables
         nb.classify(article)
         persist_classified(article)
     
-    '''
-    # cluster
-    import k_means
-    km = k_means.KMeans(articles, 3)
-    km.cluster()
-    # publish
-    for cluster in km.clusters:
-        centroid = cluster.centroid
-        print 'centroid: ', centroid.title
-        print 'category: ', ','.join(centroid.category)
-        print 'labels: ', ','.join(centroid.labels)
-        for id, point in enumerate(cluster.points):
-            print '    %s. ' % str(id + 1), point.title
-        print
-    '''
 if __name__ == "__main__":
     main()
