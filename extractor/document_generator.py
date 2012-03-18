@@ -19,7 +19,7 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-INPUT = 'twitter/perryhau'
+INPUT = 'articles/biz_value'
 
 def publish(docs, source):
     'leave a mark in database'
@@ -34,7 +34,7 @@ def publish(docs, source):
     from pymongo.collection import Collection
     col = Collection(db, collection)
     for doc in docs:
-        col.update({'source':doc.source}, {'$set':{'chinese':doc.chinese}}) 
+        col.update({'_id':doc._id}, {'$set':{'chinese':doc.chinese, 'latin':doc.latin}}) 
 
 def generate(source='articles/cnbeta'):
     'combines cleaner and segmenter'

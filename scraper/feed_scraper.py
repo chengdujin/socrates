@@ -19,9 +19,9 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-#SOURCE_URL = 'http://content.businessvalue.com.cn/feed'
-SOURCE_URL = 'http://www.alibuybuy.com/feed'
-SOURCE_NAME = 'it_weekly'.strip().lower()
+SOURCE_URL = 'http://content.businessvalue.com.cn/feed'
+#SOURCE_URL = 'http://www.caijing.com.cn/rss/political.xml'
+SOURCE_NAME = 'biz_value'.strip().lower()
 LIMIT = 2000
 GOOGLE_REQUEST_URL = 'http://www.google.com/reader/atom/feed/%s?n=%s'
 

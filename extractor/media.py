@@ -84,7 +84,7 @@ class Twitter(Document):
 	pass
 
     def collect_data(self, database):
-        database['screener'] = ['_id', 'truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'i    n_reply_to_screen_name', 'in_reply_to_user_id', 'user']
+        database['screener'] = ['truncated', 'place', 'geo', 'retweeted', 'coordinates', 'in_reply_to_status_id', 'in_reply_to_screen_name', 'in_reply_to_user_id', 'user']
         return super(Twitter, self).collect_data(database)
 
     def build_model(self, doc):

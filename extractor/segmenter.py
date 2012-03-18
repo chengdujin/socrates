@@ -35,6 +35,7 @@ def segment(collection):
     'segmentation based on fudannlp web services'
     'collection is a list of media.Tweet instances'
 
+    import media
     for id, item in enumerate(collection):
         if isinstance(item, media.Tweet) or isinstance(item, media.Article):
             old_chinese = ' '.join(item.chinese) # data in list are unicode 

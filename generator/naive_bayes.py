@@ -8,65 +8,75 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.12
-# @latest 2012.03.13
+# @latest 2012.03.18
 #
+
+# reload the script encoding
+import sys 
+reload(sys)
+sys.setdefaultencoding('UTF-8')
+
+
+import redis
+# redis constants
+REDIS_SERVER = 'localhost'
 
 
 class NaiveBayes(object):
     def __init__(self, docs):
         'disect the docs into dataset: labels and doc'
-        self.label_priors = {}
-        self.label_cond_prob = {}
         self.docs = docs
 
     def train(self):
         'calculate the priors and conditional probabilities'
+        r = redis.StrictRedis(REDIS_SERVER)
         for doc in self.docs:
-            category = doc.category
-            chinese = doc.chinese
-            segments = set(category + chinese)
-
-            for label in segments:
+            words = set(doc.category + doc.chinese + doc.latin)
+            for label in words:
 		        # compute the priors
-		        if label in self.label_priors:
-		            self.label_priors[label] += 1
+		        if r.exists('@%s' % label):
+		            r.incr('@%s' % label)
 		        else:
-		            self.label_priors[label] = 1
-		            self.label_cond_prob[label] = {}
+		            r.set('@%s' % label, 1)
+                    r.expire('@%s' % label, 60 * 60 * 2)
 		
 	    	    # compute the conditional probabilities
-		        for word in segments:
-		            if not word in self.label_cond_prob[label]: 
-			            self.label_cond_prob[label][word] = 1
+		        for word in words:
+                    key = '%s:%s' % (label, word)
+		            if r.exists(key): 
+			            r.incr(key)
 		            else:
-			            self.label_cond_prob[label][word] += 1 		
+			            r.set(key, 1)
+                        r.expire(key, 60 * 60 * 2)
 
-    def valuate_pl(self, label):
+    def valuate_pl(self, redis_cli, label):
         'calculate p(l)'
-        pl = float(self.label_priors[label]) / float(len(self.label_priors))
-        return pl
+        prior = '@%s' % label
+        return float(redis_cli.get(prior)) / float(len(redis_cli.keys("@*")))
 
-    def valuate_pdl(self, doc, label):
+    def valuate_pdl(self, redis_cli, doc, label):
         'calculate p(d|l)'
         pdl = 1 
         for word in doc:
-            if word in self.label_cond_prob[label] and word in self.label_priors:
-                pdl += float(self.label_cond_prob[label][word]) / float(self.label_priors[word])
+            prior = '@%s' % label
+            cond_prob = '%s:%s' % (label, word)
+            if redis_cli.exists(prior) and redis_cli.exists(cond_prob):
+                pdl += float(redis_cli.get(cond_prob)) / float(redis_cli.get(prior))
             else:
-                pdl += 1 / float((len(self.docs) + 1))
+                pdl += 1 / float(len(self.docs) + 1)
         if pdl == 1: 
-            return 1 / float(len(self.label_priors))
+            return 1 / float(len(redis_cli.keys('@*')))
         else: 
             return pdl
 
-    def valuate(self, label, doc):
+    def valuate(self, redis_cli, label, doc):
         'return the probability of doc with the label'
         'calculate p(d|l) * p(l) / p(d)'
 	    # p(d|l); doc should be presented as doc.chinese, e.g.
-        pdl = self.valuate_pdl(doc, label)
+        pdl = self.valuate_pdl(redis_cli, doc, label)
 
 	    # p(l)
-        pl = self.valuate_pl(label)
+        pl = self.valuate_pl(redis_clit, label)
         
 	    # pd
         '''pd = 0	 
@@ -75,39 +85,31 @@ class NaiveBayes(object):
         if pd == 0:
             pd = 1 / float(len(self.label_priors)) 
         '''
-        return (pdl * pl) 
+        return (pdl * pl)
 
     def classify(self, doc):
         'classify a file based on the trained model'
         'threshold says the confidence should be above some level'
+        r = redis.StrictRedis(REDIS_SERVER)
+        # get all the words by indicating @ as prefix
+        words = r.keys('@*')
+
         best = 0
-        first_guess = ''
-        second_guess = ''
-        third_guess = ''
-        fourth_guess = ''
-        fifth_guess = ''
-        for label in self.label_priors:
-            prob = self.valuate(label, doc.chinese)
+        guesses = []
+        for label in words:
+            prob = self.valuate(r, label, doc.chinese)
             if prob > best:
                 best = prob
-                fifth_guess = fourth_guess
-                fourth_guess = third_guess
-                third_guess = second_guess
-                second_guess = first_guess
-                first_guess = label
+                guesses.append(label)
+        guesses.reverse()
 	    
         # publish
-        if first_guess:
-            doc.labels.append(first_guess)
-            if second_guess:
-                doc.labels.append(second_guess)
-                if third_guess:
-                    doc.labels.append(third_guess)
-                    if fourth_guess:
-                        doc.labels.append(fourth_guess)
-                        if fifth_guess:
-                            doc.labels.append(fifth_guess)
-        
+        if guesses:
+            label_length = len(guesses)
+            if label_length > 5:
+                doc.labels.extend(guesses[:5]) 
+            else:
+                doc.labels.extend(guesses)
         return doc  
  
 if __name__ == "__main__":
