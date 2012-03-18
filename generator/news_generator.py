@@ -19,18 +19,32 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-database = 'articles'
+ARTICLES = 'articles'
+CLASSIFIED = 'classified'
 
+from pymongo.connection import Connection
+con = Connection(DB)
+from pymongo.database import Database
+db = Database(con, ARTICLES)
+from pymongo.collection import Collection
+
+def persist_classified(article):
+    'store the classified result in mongodb'
+    col = Collection(db, CLASSIFIED)
+    from guess in article.labels:
+        label = guess[0]
+        probability = guess[1]
+        cursor = col.find({'word':label})
+        if cursor.count():
+            for entry in cursor:
+                articles = entry['articles']
+                articles.append(article)
+                col.update({'word':label}, {"$set", {"articles":articles}})
 
 def read_and_structure():
     'read data from mongodb and structure them for the classification'
     sys.path.append('../extractor/')
     import media
-
-    from pymongo.connection import Connection
-    con = Connection(DB)
-    from pymongo.database import Database
-    db = Database(con, database)
     
     def restructure(category):
         new_category = []
@@ -47,9 +61,9 @@ def read_and_structure():
                     new_category.append(item.strip())
         return new_category
 
-    from pymongo.collection import Collection
     collections = db.collection_names()
-    articles = []
+    training = []
+    testing = []
     for col in collections:
         if col <> 'system.indexes':
             collection = Collection(db, col)
@@ -61,39 +75,36 @@ def read_and_structure():
                 article.source = entry['source']
                 article.category = restructure(entry['category'])
                 article.chinese = entry['chinese']
-                if article.chinese:
-                    articles.append(article)
-    return articles
+                article.latin = entry['latin']
+
+                if article.category:
+                    if article.chinese or article.latin:
+                        training.append(article)
+                else:
+                    if article.chinese or article.latin:
+                        testing.append(article)
+    return training, testing
 
 def main():
     'read the data, train the classifier and cluster them'
     # read from data source
-    articles = read_and_structure()
+    training, testing = read_and_structure()
 
-    # separate training articles and testing ones
-    training_size = int(len(articles) * 0.95)
-    training = []
-    for id in range(training_size):
-        article = articles.pop()
-        training.append(article)
-
-    # classify
+    # train
     import naive_bayes
     nb = naive_bayes.NaiveBayes(training)
     nb.train()
 
-    '''for article in articles:
+    for article in testing:
         # article will be classified with a lables
         nb.classify(article)
-        print article.title
-        print ','.join(article.labels)
-        print
+        persist_classified(article)
+    
     '''
     # cluster
     import k_means
     km = k_means.KMeans(articles, 3)
     km.cluster()
-    '''
     # publish
     for cluster in km.clusters:
         centroid = cluster.centroid

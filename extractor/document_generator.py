@@ -19,7 +19,7 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-INPUT = 'articles/biz_value'
+INPUT = 'articles/netease'
 
 def publish(docs, source):
     'leave a mark in database'

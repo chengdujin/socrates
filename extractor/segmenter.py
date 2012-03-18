@@ -50,7 +50,8 @@ def segment(collection):
                 
                     for segment in web_data:
                         segment = segment.strip()
-                        if segment and not segment in UNWANTED:
+                        # make sure a single character/letter is not accepted 
+                        if segment and len(segment) > 1 and not segment in UNWANTED:
                             # duplicated words should be tolerated
                             u_segment = segment.decode('utf-8')
                             if segment.isalpha():   

@@ -51,14 +51,14 @@ class NaiveBayes(object):
 
     def valuate_pl(self, redis_cli, label):
         'calculate p(l)'
-        prior = '@%s' % label
+        prior = label
         return float(redis_cli.get(prior)) / float(len(redis_cli.keys("@*")))
 
     def valuate_pdl(self, redis_cli, doc, label):
         'calculate p(d|l)'
         pdl = 1 
         for word in doc:
-            prior = '@%s' % label
+            prior = label
             cond_prob = '%s:%s' % (label, word)
             if redis_cli.exists(prior) and redis_cli.exists(cond_prob):
                 pdl += float(redis_cli.get(cond_prob)) / float(redis_cli.get(prior))
@@ -100,7 +100,7 @@ class NaiveBayes(object):
             prob = self.valuate(r, label, doc.chinese)
             if prob > best:
                 best = prob
-                guesses.append(label)
+                guesses.append((label[1:], best))
         guesses.reverse()
 	    
         # publish
@@ -110,7 +110,8 @@ class NaiveBayes(object):
                 doc.labels.extend(guesses[:5]) 
             else:
                 doc.labels.extend(guesses)
-        return doc  
+            return doc.labels
+          
  
 if __name__ == "__main__":
     pass
