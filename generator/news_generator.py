@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.16
-# @latest 2012.03.16
+# @latest 2012.03.18
 #
 
 
@@ -37,9 +37,14 @@ def persist_classified(article):
         cursor = col.find({'word':label})
         if cursor.count():
             for entry in cursor:
-                articles = entry['articles']
-                articles.append(article)
+                # articles --> (article, probability) * n
+                articles = set(entry['articles'])
+                articles.add((article, probability))
                 col.update({'word':label}, {"$set", {"articles":articles}})
+        else: # a new label
+            articles = set([])
+            articles.add((article, probability))
+            col.insert({'word':label, 'articles':articles})   
 
 def read_and_structure():
     'read data from mongodb and structure them for the classification'

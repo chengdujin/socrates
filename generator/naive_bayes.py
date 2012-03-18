@@ -56,7 +56,7 @@ class NaiveBayes(object):
 
     def valuate_pdl(self, redis_cli, doc, label):
         'calculate p(d|l)'
-        pdl = 1 
+        pdl = 0 
         for word in doc:
             prior = label
             cond_prob = '%s:%s' % (label, word)
@@ -64,7 +64,7 @@ class NaiveBayes(object):
                 pdl += float(redis_cli.get(cond_prob)) / float(redis_cli.get(prior))
             else:
                 pdl += 1 / float(len(self.docs) + 1)
-        if pdl == 1: 
+        if pdl == 0: 
             return 1 / float(len(redis_cli.keys('@*')))
         else: 
             return pdl
@@ -101,12 +101,12 @@ class NaiveBayes(object):
             if prob > best:
                 best = prob
                 guesses.append((label[1:], best))
+        # turn the highest possibility at the top
         guesses.reverse()
 	    
         # publish
         if guesses:
-            label_length = len(guesses)
-            if label_length > 5:
+            if len(guesses) > 5:
                 doc.labels.extend(guesses[:5]) 
             else:
                 doc.labels.extend(guesses)
