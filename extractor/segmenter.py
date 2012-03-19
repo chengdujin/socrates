@@ -38,9 +38,9 @@ def segment(collection):
     import media
     for id, item in enumerate(collection):
         if isinstance(item, media.Tweet) or isinstance(item, media.Article):
-            old_chinese = ' '.join(item.chinese) # data in list are unicode 
+            old_chinese = u' '.join(item.chinese) # data in list are unicode 
             #old_chinese = item # test code
-            if old_chinese and len(old_chinese) > 2:
+            if old_chinese and len(old_chinese) > 1:
                 try:
                     con = httplib.HTTPConnection(WEB_SERVICE_HOST)
                     con.request("GET", WEB_SERVICE_SEG % old_chinese)
@@ -51,13 +51,14 @@ def segment(collection):
                     for segment in web_data:
                         segment = segment.strip()
                         # make sure a single character/letter is not accepted 
-                        if segment and len(segment) > 1 and not segment in UNWANTED:
+                        if segment and not segment in UNWANTED:
                             # duplicated words should be tolerated
                             u_segment = segment.decode('utf-8')
-                            if segment.isalpha():   
-                                item.latin.append(u_segment)
-                            else:
-                                new_chinese.append(u_segment)
+                            if len(u_segment) > 1:
+                                if segment.isalpha():   
+                                    item.latin.append(u_segment)
+                                else:
+                                    new_chinese.append(u_segment)
                     if new_chinese:
                         item.chinese = new_chinese
                     print str(id + 1), ','.join(new_chinese)

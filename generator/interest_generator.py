@@ -231,8 +231,17 @@ def read(source):
     if cursor.count() > 0:
 	    docs = []
         for entry in cursor:
-            if 'seg' in entry.keys():
-		        docs.append(entry['seg'])
+            # use mongodb id_ to relate segmented words to an item
+            if 'id_' in entry.keys():
+                id_ = entry['id_']
+            words = []
+            if 'chinese' in entry.keys():
+		        words.extend(entry['chinese'])
+            if 'latin' in entry.keys():
+                words.extend(entry['latin'])
+
+            if id_ and words:
+                docs.append((id_, words))
 	    return docs
     else:
 	    return Exception("[error] read: nothing is found!")      
