@@ -11,7 +11,6 @@
 # @latest 2012.03.19
 #
 
-import random
 # reload the script encoding
 import sys
 reload(sys)

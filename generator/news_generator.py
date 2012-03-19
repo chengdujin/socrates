@@ -22,6 +22,7 @@ DB = '176.34.54.120:27017'
 ARTICLES = 'articles'
 CLASSIFIED = 'classified'
 
+from pymongo.errors import CollectionInvalid
 from pymongo.connection import Connection
 con = Connection(DB)
 from pymongo.database import Database
@@ -30,7 +31,10 @@ from pymongo.collection import Collection
 
 def persist_classified(article):
     'store the classified result in mongodb'
-    col = Collection(db, CLASSIFIED)
+    try:
+        col = db.create_collection(CLASSIFIED)
+    except CollectionInvalid as e:
+        col = Collection(db, CLASSIFIED)
     for guess in article.labels:
         label = guess[0]
         probability = guess[1]
@@ -41,13 +45,18 @@ def persist_classified(article):
             # should include at most on entry
             for entry in cursor:
                 # articles --> (article, probability) * n
-                articles = set(entry['articles'])
-                # one article indeed could have several probability values
-                articles.add((article, probability))
-                col.update({'word':label}, {"$set", {"articles":articles}})
+                articles = entry['articles']
+                if str(article._id) in articles:
+                    old_probability = articles[str(article._id)]
+                    if probability > old_probability:
+                        articles[str(article._id)] = probability
+                else:
+                    articles[str(article._id)] = probability
+                col.update({'word':label}, {"$set": {"articles":articles}})
         else: # a new label
-            articles = set([])
-            articles.add((article, probability))
+            articles = {}
+            articles[str(article._id)] = probability
+            # Cannot encode object: set([(<media.Article instance at 0x10c4ba2d8>, 0.00017787406409750482)])
             col.insert({'word':label, 'articles':articles})   
 
 def read_and_structure():
@@ -79,12 +88,20 @@ def read_and_structure():
             cursor = collection.find()
             for entry in cursor:
                 article = media.Article()
-                article.title = entry['title']
-                article.published = entry['published']
-                article.source = entry['source']
-                article.category = restructure(entry['category'])
-                article.chinese = entry['chinese']
-                article.latin = entry['latin']
+                if '_id' in entry:
+                    article._id = entry['_id']
+                if 'title' in entry:
+                    article.title = entry['title']
+                if 'published' in entry:
+                    article.published = entry['published']
+                if 'source' in entry:
+                    article.source = entry['source']
+                if 'category' in entry:
+                    article.category = restructure(entry['category'])
+                if 'chinese' in entry:
+                    article.chinese = entry['chinese']
+                if 'latin' in entry:
+                    article.latin = entry['latin']
 
                 if article.category:
                     if article.chinese or article.latin:
@@ -97,18 +114,24 @@ def read_and_structure():
 def main():
     'read the data, train the classifier and classify articles'
     # read from data source
+    print 'read data from mongodb'
     training, testing = read_and_structure()
 
     # train
+    print 'training ...'
     import naive_bayes
     nb = naive_bayes.NaiveBayes(training)
     nb.train()
 
     # classify
-    for article in testing:
+    print 'classifying'
+    articles = testing + training
+    total = len(articles)
+    for aid, article in enumerate(articles):
         # article will be classified with lables
         nb.classify(article)
         persist_classified(article)
+        print '[%s] %i' % ('-' * int(float(aid) / float(total) * 50),  int(float(aid) / float(total) * 100)) + "%"
     
 if __name__ == "__main__":
     main()

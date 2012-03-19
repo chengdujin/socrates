@@ -32,34 +32,33 @@ class NaiveBayes(object):
         r = redis.StrictRedis(REDIS_SERVER)
         for doc in self.docs:
             words = set(doc.category + doc.chinese + doc.latin)
-            for label in words:
-		        # compute the priors
-		        if r.exists('@%s' % label):
-		            r.incr('@%s' % label)
-		        else:
-		            r.set('@%s' % label, 1)
-                    r.expire('@%s' % label, 60 * 60 * 2)
-		
-	    	    # compute the conditional probabilities
-		        for word in words:
-                    key = '%s:%s' % (label, word)
-		            if r.exists(key): 
-			            r.incr(key)
-		            else:
-			            r.set(key, 1)
-                        r.expire(key, 60 * 60 * 2)
+            for label in doc.category:
+                # compute the priors
+                if r.exists(u'@%s' % label):
+                    r.incr(u'@%s' % label)
+                else:
+                    r.set(u'@%s' % label, 1)
+                    r.expire(u'@%s' % label, 60 * 60 * 24)
+                # compute the conditional probabilities
+                for word in words:
+                    key = u'%s:%s' % (label, word)
+                    if r.exists(key): 
+                        r.incr(key)
+                    else:
+                        r.set(key, 1)
+                        r.expire(key, 60 * 60 * 24)
 
     def valuate_pl(self, redis_cli, label):
         'calculate p(l)'
         prior = label
-        return float(redis_cli.get(prior)) / float(len(redis_cli.keys("@*")))
+        return float(redis_cli.get(prior)) / float(len(redis_cli.keys(u"@*")))
 
     def valuate_pdl(self, redis_cli, doc, label):
         'calculate p(d|l)'
         pdl = 0 
         for word in doc:
             prior = label
-            cond_prob = '%s:%s' % (label, word)
+            cond_prob = u'%s:%s' % (label, word)
             if redis_cli.exists(prior) and redis_cli.exists(cond_prob):
                 pdl += float(redis_cli.get(cond_prob)) / float(redis_cli.get(prior))
             else:
@@ -76,7 +75,7 @@ class NaiveBayes(object):
         pdl = self.valuate_pdl(redis_cli, doc, label)
 
 	    # p(l)
-        pl = self.valuate_pl(redis_clit, label)
+        pl = self.valuate_pl(redis_cli, label)
         
 	    # pd
         '''pd = 0	 
@@ -92,20 +91,21 @@ class NaiveBayes(object):
         'threshold says the confidence should be above some level'
         r = redis.StrictRedis(REDIS_SERVER)
         # get all the words by indicating @ as prefix
-        words = r.keys('@*')
-
+        words = r.keys(u'@*')
         best = 0
         guesses = []
-        for label in words:
-            prob = self.valuate(r, label, doc.chinese)
+        for wid, label in enumerate(words):
+            prob = self.valuate(r, label, doc.chinese + doc.latin)
             if prob > best:
                 best = prob
+                if len(guesses) > 10:
+                    guesses = guesses[-10:]
                 guesses.append((label[1:], best))
-        # turn the highest possibility at the top
-        guesses.reverse()
 	    
         # publish
         if guesses:
+            # turn the highest possibility at the top
+            guesses.reverse()
             if len(guesses) > 5:
                 doc.labels.extend(guesses[:5]) 
             else:
