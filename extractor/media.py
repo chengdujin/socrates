@@ -218,11 +218,16 @@ class Tweet:
 
 class Segment:
     'class to model a segment, including chinese, japanase and english'
-    def __init__(self, doc):
-        self.word = ''
-        if 'word' in doc:
-            self.word = doc['word']
-        if 'count' in doc:
-            self.count = int(doc['count'])
-        if 'records' in doc: # records is a list
-            self.records = doc['records']
+    def __init__(self, word, entry):
+        self.word = word
+        # use mongodb id_ to relate segmented words to an item
+        if 'id_' in entry.keys():
+            self.id_ = entry['id_']
+        if 'published' in entry.keys():
+            self.published = entry['published']
+        if 'retweeted' in entry.keys():
+            self.retweeted = entry['retweeted']
+        if 'favorited' in entry.keys():
+            self.favorited = entry['favorited']
+        if 'users' in entry.keys():
+            self.no_users = len(entry['users'])
