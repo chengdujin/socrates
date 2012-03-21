@@ -9,19 +9,20 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.18
-# @latest 2012.03.19
+# @latest 2012.03.21
 #
 
+import random
 # reload the script encoding
 import sys 
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
-TOPIC_NUMBER = 20
+TOPIC_NUMBER = 10
 ALPHA = 2
 BETA = .5
-ITERATION = 1000
-burnin = 500
+ITERATION = 500
+burnin = 200
 
 class LDA(object):
     'class to model lda computation'
@@ -64,7 +65,7 @@ class LDA(object):
             dc = {}
             # a word is an instance of Segment
             for word in doc:
-                rand_topic = random.randint(1, TOPIC_NUMBER)
+                rand_topic = random.randint(0, TOPIC_NUMBER-1)
                 word_vocab_id = self.vocab_index[word]
                 # build doc-vocab
                 dc[word_vocab_id] = rand_topic
@@ -103,6 +104,7 @@ class LDA(object):
     def learn(self):
         'lda implementation'
         for it in xrange(0, ITERATION):
+            print 'processing %i of %i' % (it, ITERATION)
             for doc_id in self.doc_vocab:
                 for word_vocab_id in self.doc_vocab[doc_id]:
                     # sample full conditional
@@ -138,7 +140,7 @@ class LDA(object):
                     else:
                         self.doc_topic[doc_id][topic] += 1
 
-                    if topic not in topics:
+                    if topic not in self.topics:
                         self.topics[topic] = 1
                     else:
                         self.topics[topic] += 1
@@ -148,9 +150,14 @@ class LDA(object):
 
     def publish_topics(self):
         'generate a list of all topics for a corpus'
-        pass
+        topic_word = self.generate_topic_word()
+        topics_linked = []
+        for topic in self.topics:
+            #print ','.join([term.word for term in topic_word[topic]])
+            topics_linked.append(topic_word[topic])
+        return topics_linked
 
-    def publish_topics_for_doc(self):
+    def generate_topic_word(self):
         'generate estimated topics for a document'
         from collections import OrderedDict
 
@@ -160,7 +167,7 @@ class LDA(object):
             vt = self.vocab_topic[word_vocab_id]
             sorted_vt = OrderedDict(sorted(vt.items(), key=lambda x: -x[1]))
             for svt, (k, v) in enumerate(sorted_vt.items()):
-                if svt > 3:
+                if svt > 10:
                     break
                 else:
                     if k not in topic_vocab:
@@ -179,16 +186,17 @@ class LDA(object):
         # combine topic-vocab with index_vocab to create a topic_id --> vocabulary list map
         topic_word = {}
         for topic_id in topic_vocab:
-            topic_word[topic_id] = ''
+            topic_word[topic_id] = []
             tv = topic_vocab[topic_id]
             sorted_tv = OrderedDict(sorted(tv.items(), key=lambda x: -x[1]))
             for stv, (k, v) in enumerate(sorted_tv.items()):
-                if stv > 3:
+                if stv > 10:
                     break
                 else:
-                    topic_word[topic_id] += index_vocab[k] + ','
+                    topic_word[topic_id].append(self.index_vocab[k])
+        return topic_word
 
-        # publish
+        '''# publish
         for doc_id, doc in enumerate(self.docs):
             if doc_id in self.doc_topic and len(doc) > 2:
                 topic_list = self.doc_topic[doc_id]
@@ -201,7 +209,7 @@ class LDA(object):
                         wanted_strings.append(topic_word[k])
             print str(doc_id + 1) + '.' +  ','.join(doc)
             print '>> ' + ' '.join(wanted_strings)
-            print
+            print'''
 
 if __name__ == '__main__':
     pass

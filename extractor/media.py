@@ -220,16 +220,17 @@ class Segment:
     'class to model a segment, including chinese, japanase and english'
     def __init__(self, word, entry):
         self.word = word
+        self.terms = []
         # use mongodb id_ to relate segmented words to an item
-        if 'id_' in entry.keys():
+        if 'id_' in entry:
             self.id_ = entry['id_']
-        if 'published' in entry.keys():
+        if 'published' in entry:
             self.published = entry['published']
-        if 'retweeted' in entry.keys():
+        if 'retweeted' in entry:
             self.retweeted = entry['retweeted']
-        if 'favorited' in entry.keys():
+        if 'favorited' in entry:
             self.favorited = entry['favorited']
-        if 'users' in entry.keys():
+        if 'users' in entry:
             self.no_users = len(entry['users'])
     
     def __str__(self):

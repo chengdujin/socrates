@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.15
-# @latest 2012.03.16
+# @latest 2012.03.21
 #
 
 # reload the script encoding

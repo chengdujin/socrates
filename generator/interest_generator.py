@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.10
-# @latest 2012.03.19
+# @latest 2012.03.21
 #
 
 # reload the script encoding
@@ -17,7 +17,7 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-SOURCE = 'twitter/chengdujin.chinese'
+SOURCE = 'twitter/perryhau'
 DB = '176.34.54.120:27017'
 
 
@@ -39,22 +39,24 @@ def read(source):
 
     cursor = collection.find()
     if cursor.count() > 0:
-	    docs = []
+        docs = []
         for entry in cursor:
             # wrap the segmented word in an Segment class
             words = []
-            if 'chinese' in entry.keys():
+            if 'chinese' in entry:
                 for word in entry['chinese']:
-		            words.append(Segment(word, entry))
-            if 'latin' in entry.keys():
+                    if word:
+		                words.append(Segment(word, entry))
+            if 'latin' in entry:
                 for word in entry['latin']:
-                    words.extend(Segment(word, entry))
+                    if word:
+                        words.append(Segment(word, entry))
 
             if words: # array of self-aware segmented word
                 docs.append(words)
-	    return docs
+        return docs
     else:
-	    return Exception("[error] read: nothing is found!")      
+        return Exception("[error] read: nothing is found!") 
 
 def generate(source):
     '''
@@ -69,7 +71,7 @@ def generate(source):
     topic_extractor = lda.LDA(seg_list)
     #screen()
     topic_extractor.learn()
-    topic_extractor.publish()
-
+    topic_extractor.publish_topics()
+    
 if __name__ == '__main__':
     generate(SOURCE)
