@@ -34,7 +34,7 @@ class KMeans(object):
     def __init__(self, docs, k=None):
         self.k = k
         self.docs = docs
-        self.centroids = self.init_centroids(docs, k)
+        self.points, self.centroids = self.init_centroids(docs, k)
         self.clusters = []
 
     def init_centroids(self, docs, limit):
@@ -46,7 +46,7 @@ class KMeans(object):
             points.extend(doc)
         
         import random
-        from collections import OrderedDict
+        from ordereddict import OrderedDict
         centroids = []
         weighted_points = {}
         for point in points:
@@ -57,12 +57,15 @@ class KMeans(object):
         weighted_points = OrderedDict(sorted(weighted_points.items(), key=lambda d: -d[1]))
         for i in range(limit):
             centroids.append(weighted_points.keys()[i])
-        return centroids
+        return points, centroids
 
     def distance(self, centroid, point):
         'calculate the distance between the two points'
+	if not centroid or not point:
+		return 0
+
         # a point (incl. centroid) is an instance of media.Segment
-        if r.exists(u'@%s' % centroid.word) or r.exists(u'@%s' % point.word);
+        if r.exists(u'@%s' % centroid.word) or r.exists(u'@%s' % point.word):
             if centroid.word <> point.word:
                 first = r.get(u'%s:%s' % (centroid.word, point.word))
                 first = first if first else 0
@@ -72,7 +75,7 @@ class KMeans(object):
                     return first if first > second else second
                 else: # if one word does not really exists, which is highly possible
                     # compute the average value
-                    compounds = r.keys(u'%s:*' % (centroid.word if fist else point.word))
+                    compounds = r.keys(u'%s:*' % (centroid.word if first else point.word))
                     total = 0
                     for v in compounds:
                         total += float(r.get(v))
@@ -106,7 +109,7 @@ class KMeans(object):
             total_dist = 0
             for dist in dists:
                 total_dist += dist
-            average_dist = float(total) / float(len(all_points) - 1)
+            average_dist = float(total_dist) / float(len(all_points) - 1)
             if average_dist > max_dist:
                 max_dist = average_dist
                 new_centroid = point
@@ -160,7 +163,7 @@ class KMeans(object):
             terms.append(cluster.centroid)
             terms.extend(cluster.points)
             if terms:
-                print cluster.centroid.word:
+                print cluster.centroid.word;
                 print ','.join([p.word for p in cluster.points])
                 print
                 words.append(terms)

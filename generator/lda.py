@@ -161,7 +161,7 @@ class LDA(object):
 
     def generate_topic_word(self):
         'generate estimated topics for a document'
-        from collections import OrderedDict
+        from ordereddict import OrderedDict
 
         # build topic-vocab map
         topic_vocab = {}
