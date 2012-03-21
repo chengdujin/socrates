@@ -73,14 +73,14 @@ def generate(source):
     print 'reading data from database'
     seg_list = read(source)
 
-    '''# compute hidden topics via lda
+    # compute hidden topics via lda
     print '\nlda starting ...'
     import lda
     topic_extractor = lda.LDA(seg_list)
     #screen()
     topic_extractor.learn()
     # topics is a collection of Segment instances
-    topics = topic_extractor.publish()'''
+    topics = topic_extractor.publish()
     
     # cluster the segemented words
     print '\nclustering ...'
