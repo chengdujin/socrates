@@ -65,13 +65,23 @@ def generate(source):
     3. remove data of low frequency
     4. learn and repeat
     5. publish the result
+    6. cluster the result
+    7. publish the clustered segemented words
     '''
+
+    # read data from mongodb
     seg_list = read(source)
+
+    # compute hidden topics via lda
     import lda
     topic_extractor = lda.LDA(seg_list)
     #screen()
     topic_extractor.learn()
-    topic_extractor.publish_topics()
+    # topics is a collection of Segment instances
+    topics = topic_extractor.publish_topics()
+
+    # cluster the segemented words
+    import kmeans
     
 if __name__ == '__main__':
     generate(SOURCE)

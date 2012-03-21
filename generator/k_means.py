@@ -11,6 +11,10 @@
 # @latest 2012.03.21
 #
 
+import redis
+REDIS_SERVER = 'localhost'
+r = redis.StrictRedis(REDIS_SERVER)
+
 # reload the script encoding
 import sys 
 reload(sys)
@@ -24,17 +28,23 @@ class Cluster(object):
         self.points = []
         self.word_map = {}
 
+
 class KMeans(object):
     'a simple implementation of k-means algorithm'
-    def __init__(self, points, k=None):
+    def __init__(self, docs, k=None):
         self.k = k
-        self.points = points
-        self.centroids = self.init_centroids(points, k)
+        self.docs = docs
+        self.centroids = self.init_centroids(docs, k)
         self.clusters = []
 
-    def init_centroids(self, points, limit):
+    def init_centroids(self, docs, limit):
         'pick the inital centroids among the data points'
         'the candidates should be stored in self.centroids'
+        # merge all the points
+        points = []
+        for doc in docs:
+            points.extend(doc)
+        
         import random
         from collections import OrderedDict
         centroids = []
@@ -51,37 +61,56 @@ class KMeans(object):
 
     def distance(self, centroid, point):
         'calculate the distance between the two points'
-        intersect = set(centroid.labels) & set(point.labels)
-        return float(len(intersect) / (len(point.labels) + 1))
-
+        # a point (incl. centroid) is an instance of media.Segment
+        if r.exists(u'@%s' % centroid.word) or r.exists(u'@%s' % point.word);
+            if centroid.word <> point.word:
+                first = r.get(u'%s:%s' % (centroid.word, point.word))
+                first = first if first else 0
+                second = r.get(u'%s:%s' % (point.word, centroid.word))
+                second = second if second else 0
+                if first or second:
+                    return first if first > second else second
+                else: # if one word does not really exists, which is highly possible
+                    # compute the average value
+                    compounds = r.keys(u'%s:*' % (centroid.word if fist else point.word))
+                    total = 0
+                    for v in compounds:
+                        total += float(r.get(v))
+                    return total / float(len(compounds))
+            else: # if two words are the same, they should have the closest distance
+                return 1e30000
+        else: # no words actually exists
+            return 0
+            
     def find_closest_centroid(self, point):
         'find the closest centroid by distance'
-        minimum = float(1)
+        maximum = float(0)
         closest = None
         for centroid in self.centroids:
             dist = self.distance(centroid, point) 
-            if dist < minimum:
-                minimum = dist
+            if dist > maximum:
+                maximum = dist
                 closest = centroid
         return closest    
 
     def find_centroid(self, cluster):
-        'find the centroid within a cluster'
-        minimum_total_dist = len(cluster.points) - 1
-        centroid_candidate = None
-        for point in cluster.points:
+        'find the centroid within a cluster by finding out the smallest average value from a node to others'
+        all_points = []
+        all_points.extend(cluster.points)
+        all_points.append(cluster.centroid)
+        new_centroid = None
+        max_dist = 0
+
+        for point in all_points:
+            dists = [self.distance(point, p) if point <> p else 0 for p in all_points]
             total_dist = 0
-            a = point.labels
-            # compare with other points
-            for other in cluster.points:
-                if point <> other:
-                    b = other.labels
-                    intersect = set(a) & set(b)
-                    total_dist += (float(len(intersect)) / float(len(other.labels) + 1))
-            if total_dist < minimum_total_dist:
-                minimum_total_dist = total_dist
-                centroid_candidate = point
-        return centroid_candidate
+            for dist in dists:
+                total_dist += dist
+            average_dist = float(total) / float(len(all_points) - 1)
+            if average_dist > max_dist:
+                max_dist = average_dist
+                new_centroid = point
+        return new_centroid
     
     def cluster(self):
         ''
@@ -90,6 +119,7 @@ class KMeans(object):
         centroids_changed = True
         while centroids_changed:
             for point in self.points:
+                # point is an instance of media.Segment
                 # the closest centroid to point
                 closest = self.find_closest_centroid(point)
                 # gotch is an instance of Cluster
@@ -112,7 +142,6 @@ class KMeans(object):
             clusters = []
             for old_cluster in old_clusters:
                 if len(old_cluster.points):
-                    # old_cluster is an instance of Cluster
                     new_centroid = self.find_centroid(old_cluster)
                     if new_centroid <> old_cluster.centroid:
                         centroid_changed = True
@@ -122,6 +151,21 @@ class KMeans(object):
                     else:
                         clusters.append(old_cluster)
         self.clusters = clusters
+
+    def publish(self):
+        words = []
+        for cluster in self.clusters:
+            terms = []
+            # first one is the center node of the cluster
+            terms.append(cluster.centroid)
+            terms.extend(cluster.points)
+            if terms:
+                print cluster.centroid.word:
+                print ','.join([p.word for p in cluster.points])
+                print
+                words.append(terms)
+        if words:
+            return words
 
 if __name__ == '__main__':
     'test ground'
