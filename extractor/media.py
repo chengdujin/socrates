@@ -231,3 +231,6 @@ class Segment:
             self.favorited = entry['favorited']
         if 'users' in entry.keys():
             self.no_users = len(entry['users'])
+    
+    def __str__(self):
+        return self.word

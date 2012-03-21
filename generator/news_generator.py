@@ -35,6 +35,7 @@ def persist_classified(article):
         col = db.create_collection(CLASSIFIED)
     except CollectionInvalid as e:
         col = Collection(db, CLASSIFIED)
+
     for guess in article.labels:
         label = guess[0]
         probability = guess[1]
@@ -56,7 +57,6 @@ def persist_classified(article):
         else: # a new label
             articles = {}
             articles[str(article._id)] = probability
-            # Cannot encode object: set([(<media.Article instance at 0x10c4ba2d8>, 0.00017787406409750482)])
             col.insert({'word':label, 'articles':articles})   
 
 def read_and_structure():

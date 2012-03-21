@@ -58,6 +58,7 @@ class LDA(object):
 
         for doc_id, doc in enumerate(self.docs):
             # build documents
+            # a doc is a collection of Segment instances
             documents[doc_id] = len(doc)
 
             dc = {}
@@ -111,39 +112,46 @@ class LDA(object):
                     self.topics[topic] -= 1
                     self.documents[doc_id] -= 1
 
-                # multinomial sampling via cumulative method
-                probability = {}
-                for k in xrange(0, TOPIC_NUMBER):
-                    probability[k] = (self.vocab_topic[word_vocab_id][topic] + BETA) / (self.topics[topic] + len(self.vocab_index) * BETA) * (self.doc_topic[doc_id][topic] + ALPHA) / (self.documents[doc_id] + TOPIC_NUMBER * ALPHA)
+                    # multinomial sampling via cumulative method
+                    probability = {}
+                    for k in xrange(0, TOPIC_NUMBER):
+                        probability[k] = (float(self.vocab_topic[word_vocab_id][topic]) + float(BETA)) / (float(self.topics[topic]) + float(len(self.vocab_index)) * float(BETA)) * (float(self.doc_topic[doc_id][topic]) + float(ALPHA)) / (float(self.documents[doc_id]) + float(TOPIC_NUMBER) * float(ALPHA))
                 
-                # cumulate multinomial parameters
-                for k in xrange(1, len(probability)):
-                    probability[k] += probability[k - 1];
+                    # cumulate multinomial parameters
+                    for k in xrange(1, len(probability)):
+                        probability[k] += probability[k - 1];
 
-                # scaled sample because of unnormalised probability[]
-                u = random.random() * probability[TOPIC_NUMBER -1]
-                for topic in xrange(0, len(probability)):
-                    if probability[topic] > u:
-                        break
+                    # scaled sample because of unnormalised probability[]
+                    u = float(random.random()) * float(probability[TOPIC_NUMBER -1])
+                    for topic in xrange(0, len(probability)):
+                        if probability[topic] > u:
+                            break
 
-                # add back new estimated value
-                if topic not in self.vocab_topic[word_vocab_id]:
-                    self.vocab_topic[word_vocab_id][topic] = 1
-                else:
-                    self.vocab_topic[word_vocab_id][topic] += 1
-                if not topic in self.doc_topic[doc_id]:
-                    self.doc_topic[doc_id][topic] = 1
-                else:
-                    self.doc_topic[doc_id][topic] += 1
-                if topic not in topics:
-                    self.topics[topic] = 1
-                else:
-                    self.topics[topic] += 1
-                self.documents[doc_id] += 1
-                self.doc_vocab[doc_id][word_vocab_id] = topic
+                    # add back new estimated value
+                    if topic not in self.vocab_topic[word_vocab_id]:
+                        self.vocab_topic[word_vocab_id][topic] = 1
+                    else:
+                        self.vocab_topic[word_vocab_id][topic] += 1
 
-    def publish(self):
-        'simple publication'
+                    if not topic in self.doc_topic[doc_id]:
+                        self.doc_topic[doc_id][topic] = 1
+                    else:
+                        self.doc_topic[doc_id][topic] += 1
+
+                    if topic not in topics:
+                        self.topics[topic] = 1
+                    else:
+                        self.topics[topic] += 1
+
+                    self.documents[doc_id] += 1
+                    self.doc_vocab[doc_id][word_vocab_id] = topic
+
+    def publish_topics(self):
+        'generate a list of all topics for a corpus'
+        pass
+
+    def publish_topics_for_doc(self):
+        'generate estimated topics for a document'
         from collections import OrderedDict
 
         # build topic-vocab map
@@ -164,8 +172,8 @@ class LDA(object):
                             old_association = vocab_list[word_vocab_id]
                             if old_association < v:
                                 vocab_list[word_vocab_id] = v
-                            else:
-                                vocab_list[word_vocab_id] = v
+                        else:
+                            vocab_list[word_vocab_id] = v
                     topic_vocab[k] = vocab_list
 
         # combine topic-vocab with index_vocab to create a topic_id --> vocabulary list map
