@@ -18,7 +18,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('UTF-8')
 
-TOPIC_NUMBER = 10
+TOPIC_NUMBER = 5
 ALPHA = 2
 BETA = .5
 ITERATION = 500
@@ -148,12 +148,14 @@ class LDA(object):
                     self.documents[doc_id] += 1
                     self.doc_vocab[doc_id][word_vocab_id] = topic
 
-    def publish_topics(self):
+    def publish(self):
         'generate a list of all topics for a corpus'
         topic_word = self.generate_topic_word()
         topics_linked = []
         for topic in self.topics:
-            #print ','.join([term.word for term in topic_word[topic]])
+            print topic, self.topics[topic], ":"
+            print ','.join([term.word for term in topic_word[topic]])
+            print
             topics_linked.append(topic_word[topic])
         return topics_linked
 
