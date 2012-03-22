@@ -132,7 +132,7 @@ def main():
     labels = []
     for aid, article in enumerate(articles):
         # article will be classified with lables
-        nb.classify(article)
+        article.labels.extend(nb.classify(article))
         labels = persist_classified(article, labels)
         print '[%s] %i' % ('-' * int(float(aid) / float(total) * 50),  int(float(aid) / float(total) * 100)) + "%"
     

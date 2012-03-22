@@ -111,14 +111,17 @@ class NaiveBayes(object):
                 guesses.append((label[1:], best))
 	    
         # publish
+        labels = []
         if guesses:
             # turn the highest possibility at the top
             guesses.reverse()
             if len(guesses) > 7:
-                doc.labels.extend(guesses[:7]) 
+                labels.extend(guesses[:7]) 
             else:
-                doc.labels.extend(guesses)
-            return doc.labels
+                labels.extend(guesses)
+            if labels:
+                return labels
+        return None
  
 if __name__ == "__main__":
     pass
