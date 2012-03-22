@@ -1,0 +1,13 @@
+这个包包含的内容有：
+
+1. 调用所有其他代码的入口代码 socrates.py
+
+2. 对兴趣分词以及文章进行排序的代码 ranker.py
+
+流程是这样的
+
+1. 从generator/interest_generator.py中取得所有的分词
+2. 利用socrates/ranker.py对分词进行排序
+3. 将排好序的分词内容交给generator/naive_bayes.py进行分类，找到合适的类别
+4. 从数据库中取出相关的类别内容
+5. 利用socrates/ranker.py对类别内容进行排序，选出部分内容
