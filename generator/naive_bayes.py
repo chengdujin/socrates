@@ -89,13 +89,21 @@ class NaiveBayes(object):
     def classify(self, doc):
         'classify a file based on the trained model'
         'threshold says the confidence should be above some level'
+        sys.path.append('../extractor')
+        import media
+        if isinstance(doc, media.Article):
+            to_classify = doc.chinese + doc.latin
+        else:
+            # each d is an instance of media.Segment
+            to_classify = [d.word for d in doc]
+
         r = redis.StrictRedis(REDIS_SERVER)
         # get all the words by indicating @ as prefix
         words = r.keys(u'@*')
         best = 0
         guesses = []
         for wid, label in enumerate(words):
-            prob = self.valuate(r, label, doc.chinese + doc.latin)
+            prob = self.valuate(r, label, to_classify)
             if prob > best:
                 best = prob
                 if len(guesses) > 10:
