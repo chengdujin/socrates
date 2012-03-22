@@ -88,6 +88,7 @@ def generate(source):
     km = k_means.KMeans(seg_list, 5)
     km.cluster()
     cluster = km.publish()
+    return cluster
     
 if __name__ == '__main__':
     generate(SOURCE)

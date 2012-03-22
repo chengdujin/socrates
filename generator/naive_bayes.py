@@ -106,12 +106,11 @@ class NaiveBayes(object):
         if guesses:
             # turn the highest possibility at the top
             guesses.reverse()
-            if len(guesses) > 5:
-                doc.labels.extend(guesses[:5]) 
+            if len(guesses) > 7:
+                doc.labels.extend(guesses[:7]) 
             else:
                 doc.labels.extend(guesses)
             return doc.labels
-          
  
 if __name__ == "__main__":
     pass

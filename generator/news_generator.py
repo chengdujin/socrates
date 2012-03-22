@@ -29,7 +29,7 @@ from pymongo.database import Database
 db = Database(con, ARTICLES)
 from pymongo.collection import Collection
 
-def persist_classified(article):
+def persist_classified(article, label_stats):
     'store the classified result in mongodb'
     try:
         col = db.create_collection(CLASSIFIED)
@@ -38,6 +38,7 @@ def persist_classified(article):
 
     for guess in article.labels:
         label = guess[0]
+	label_stats.append(label)
         probability = guess[1]
 
         # check if the label is already stored
@@ -58,6 +59,7 @@ def persist_classified(article):
             articles = {}
             articles[str(article._id)] = probability
             col.insert({'word':label, 'articles':articles})   
+	return list(set(label_stats))
 
 def read_and_structure():
     'read data from mongodb and structure them for the classification'
@@ -127,10 +129,11 @@ def main():
     print 'classifying'
     articles = testing + training
     total = len(articles)
+    labels = []
     for aid, article in enumerate(articles):
         # article will be classified with lables
         nb.classify(article)
-        persist_classified(article)
+        labels = persist_classified(article, labels)
         print '[%s] %i' % ('-' * int(float(aid) / float(total) * 50),  int(float(aid) / float(total) * 100)) + "%"
     
 if __name__ == "__main__":
