@@ -172,7 +172,7 @@ class News(Document):
         return article
 
 
-class Article():
+class Article(object):
     ''
     def __init__(self, _id = None, author = None, title = None, published = None, source = None, category = None):
         # id_ - document id, which should be mapped to _id in mongodb
@@ -192,7 +192,7 @@ class Article():
         return 'title:\n' + str(self.title) + '\nauthor:\n' + str(self.author) + '\npublished:\n' + str(self.published) + '\nsource:\n' + str(self.source) + '\ncategory:\n' + ','.join(self.category) + '\nchinese:\n' + ','.join(self.chinese) + '\n'  
 
 
-class Tweet:
+class Tweet(object):
     def __init__(self, id_ = None, _id = None, text = None, favorited = None, published = None, retweeted = None, source = None):
         # id_ - twitter id, which, however, should be mapped to _id in mongodb, not twitter id
         self.id_ = id_
@@ -216,22 +216,17 @@ class Tweet:
     def __str__(self):
         return 'keywords:\n' + str(self.keywords) + '\nchinese:\n' + str(self.chinese) + '\nlatin:\n' + str(self.latin) + '\nurls:\n' + str(self.urls) + '\nhashtags:\n' + str(self.hashtags) + '\nusers:\n' + str(self.users) + '\npublished:\n' + str(self.created_at) + '\nsource:\n' + str(self.source) + '\n'
 
-class Segment:
+class Segment(object):
     'class to model a segment, including chinese, japanase and english'
     def __init__(self, word, entry):
         self.word = word
         self.terms = []
         # use mongodb id_ to relate segmented words to an item
-        if 'id_' in entry:
-            self.id_ = entry['id_']
-        if 'published' in entry:
-            self.published = entry['published']
-        if 'retweeted' in entry:
-            self.retweeted = entry['retweeted']
-        if 'favorited' in entry:
-            self.favorited = entry['favorited']
-        if 'users' in entry:
-            self.no_users = len(entry['users'])
+        self.id_ = entry['id_'] if 'id_' in entry else ''
+        self.published = entry['published'] if 'published' in entry else ''
+        self.retweeted = entry['retweeted'] if 'retweeted' in entry else 0
+        self.favorited = entry['favorited'] if 'favorited' in entry else False
+        self.no_users = len(entry['users']) if 'users' in entry else 0
     
     def __str__(self):
         return self.word

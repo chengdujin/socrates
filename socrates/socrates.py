@@ -17,7 +17,7 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 
-def get()
+def get():
     '''1. get the segmented words
        2. rank the words
        3. classify the words
@@ -27,13 +27,14 @@ def get()
     '''
     sys.path.append('../generator')
     import interest_generator
-    cluster = interest_generator.generate('articles/perryhau') 
+    cluster = interest_generator.generate('twitter/perryhau') 
     import ranker
     ranked = ranker.rank_segments(cluster)
     import naive_bayes
     labels = []
+    nb = naive_bayes.NaiveBayes(None)
     for doc in ranked:
-        labels.extend(naive_bayes.classify(ranked))
+        labels.extend(nb.classify(ranked))
     
     # retrieve articles of these labels
     from pymongo.connection import Connection 
@@ -43,6 +44,7 @@ def get()
     from pymongo.collection import collection
     col = Collection(db, 'classified')
 
+    print 'read from database ...'
     result = {}
     for label in labels:
         record = col.find_one({'word':label})
@@ -61,4 +63,4 @@ def get()
     return result
 
 if __name__ == "__main__":
-    main()
+    get()

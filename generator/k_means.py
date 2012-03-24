@@ -61,8 +61,8 @@ class KMeans(object):
 
     def distance(self, centroid, point):
         'calculate the distance between the two points'
-	if not centroid or not point:
-		return 0
+        if not centroid or not point: 
+            return 0
 
         # a point (incl. centroid) is an instance of media.Segment
         if r.exists(u'@%s' % centroid.word) or r.exists(u'@%s' % point.word):
@@ -83,7 +83,7 @@ class KMeans(object):
             else: # if two words are the same, they should have the closest distance
                 return 1e30000
         else: # no words actually exists
-            return 0
+            return 1 / float(len(r.keys('@*')))
             
     def find_closest_centroid(self, point):
         'find the closest centroid by distance'
@@ -120,7 +120,12 @@ class KMeans(object):
         # array of Cluster instances
         clusters = []
         centroids_changed = True
+        counter = 1
         while centroids_changed:
+            print counter, 'round'
+            if counter > 2:
+                break
+            counter += 1
             for point in self.points:
                 # point is an instance of media.Segment
                 # the closest centroid to point
@@ -150,8 +155,10 @@ class KMeans(object):
                         centroid_changed = True
                         new_cluster = Cluster()
                         new_cluster.centroid = new_centroid
+                        print type(new_centroid)
                         clusters.append(new_cluster)
                     else:
+                        print '---------------------------', type(new_centroid), type(old_cluster.centroid)
                         clusters.append(old_cluster)
         self.clusters = clusters
 

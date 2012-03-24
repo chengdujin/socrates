@@ -21,8 +21,8 @@ sys.setdefaultencoding('UTF-8')
 TOPIC_NUMBER = 5
 ALPHA = 2
 BETA = .5
-ITERATION = 500
-burnin = 200
+ITERATION = 100
+burnin = 50
 
 class LDA(object):
     'class to model lda computation'

@@ -22,7 +22,7 @@ TWITTER_BASETIME = 200603212150
 
 def convert_time(orthod_time):
     'convert a twitter orthodox time into integer'
-    pass
+    return 201203230425
 
 def score_segment(word):
     ''
@@ -30,7 +30,8 @@ def score_segment(word):
     # year and month are kept integer
     import math
     normalized_time = float(convert_time(word.published) - TWITTER_BASETIME) / 100
-    normalized_rt = 0.5 * math.log(word.retweeted, 5)
+    word.retweeted = 2
+    normalized_rt = 0.5 * math.log(float(word.retweeted), 5)
     normalized_fv = 0.2 * (1 if word.favorited else 0)
     normalized_nu = 0.4 * word.no_users  
     return float(normalized_nu + normalized_rt + normalized_fv) * float(normalized_time)
@@ -50,7 +51,7 @@ def score_segments(collection):
     total = 0
     for point in points:
         total += score_segment(point)
-    return float(centroid) * 0.35 + float(total) / float(len(points)) * 0.65
+    return float(centroid) * 0.35 + float(total) / float(len(points) + 1) * 0.65
 
 def rank_segments(docs):
     'method to rank segments'
@@ -59,7 +60,8 @@ def rank_segments(docs):
     scored_docs = {}
     for collection in docs:
         score = score_segments(collection)
-        scored_docs[collection] = score
+        strs = [c.word for c in collection]
+        scored_docs[','.join(strs)] = score
 
     # ranking
     from ordereddict import OrderedDict
@@ -69,7 +71,9 @@ def rank_segments(docs):
         if sd > 5:
             break
         else:
-            ranked_docs.append(k)
+            print k
+            k_splits = k.split(',')
+            ranked_docs.append(k_splits)
     return ranked_docs
 
 def rank(docs):

@@ -24,7 +24,7 @@ DB = '176.34.54.120:27017'
 def read(source):
     'simply read segments from mongodb'
     sys.path.append('../extractor')
-    from media import Segment
+    import media
 
     lines = source.split('/')
     head = lines[0]
@@ -46,11 +46,11 @@ def read(source):
             if 'chinese' in entry:
                 for word in entry['chinese']:
                     if word:
-		                words.append(Segment(word, entry))
+                        words.append(media.Segment(word, entry))
             if 'latin' in entry:
                 for word in entry['latin']:
                     if word:
-                        words.append(Segment(word, entry))
+                        words.append(media.Segment(word, entry))
 
             if words: # array of self-aware segmented word
                 docs.append(words)
@@ -69,24 +69,27 @@ def generate(source):
     7. publish the clustered segemented words
     '''
 
+    sys.path.append('../extractor')
+    import media
     # read data from mongodb
     print 'reading data from database'
     seg_list = read(source)
 
     # compute hidden topics via lda
-    '''print '\nlda starting ...'
+    print '\nlda starting ...'
     import lda
     topic_extractor = lda.LDA(seg_list)
     #screen()
     topic_extractor.learn()
     # topics is a collection of Segment instances
     topics = topic_extractor.publish()
-    '''
+     
     # cluster the segemented words
     print '\nclustering ...'
     import k_means
-    km = k_means.KMeans(seg_list, 5)
+    km = k_means.KMeans(topics, 5)
     km.cluster()
+    print 'ready to publish the result'
     cluster = km.publish()
     return cluster
     
