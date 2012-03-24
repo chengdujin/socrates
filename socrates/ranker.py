@@ -22,7 +22,8 @@ TWITTER_BASETIME = 200603212150
 
 def convert_time(orthod_time):
     'convert a twitter orthodox time into integer'
-    return 201203230425
+    import time
+    return int(time.strftime('%Y%m%d%H%M%S', time.strptime(orthod_time,'%a %b %d %H:%M:%S +0000 %Y')))
 
 def score_segment(word):
     ''
@@ -57,23 +58,19 @@ def rank_segments(docs):
     'method to rank segments'
     'docs is a collection of collections of segments'
     'the idea is to rank the collections by its average ranking score'
-    scored_docs = {}
+    scored_docs = []
     for collection in docs:
         score = score_segments(collection)
-        strs = [c.word for c in collection]
-        scored_docs[','.join(strs)] = score
+        scored_docs.append((score, collection))
 
     # ranking
-    from ordereddict import OrderedDict
-    sorted_docs = OrderedDict(sorted(scored_docs.items(), key=lambda x: -x[1]))  
     ranked_docs = []
-    for sd, (k, v) in enumerate(sorted_docs.items()):
+    sorted_docs = sorted(scored_docs, key=lambda p:-p[0])
+    for sd, sorted_doc in enumerate(sorted_docs):
         if sd > 5:
             break
         else:
-            print k
-            k_splits = k.split(',')
-            ranked_docs.append(k_splits)
+            ranked_docs.append(sorted_doc[1])
     return ranked_docs
 
 def rank(docs):

@@ -126,7 +126,7 @@ def main():
     nb.train()
 
     # classify
-    '''print 'classifying'
+    print 'classifying ...'
     articles = testing + training
     total = len(articles)
     labels = []
@@ -135,6 +135,6 @@ def main():
         article.labels.extend(nb.classify(article))
         labels = persist_classified(article, labels)
         print '[%s] %i' % ('-' * int(float(aid) / float(total) * 50),  int(float(aid) / float(total) * 100)) + "%"
-    '''
+    
 if __name__ == "__main__":
     main()

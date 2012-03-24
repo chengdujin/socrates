@@ -223,10 +223,10 @@ class Segment(object):
         self.terms = []
         # use mongodb id_ to relate segmented words to an item
         self.id_ = entry['id_'] if 'id_' in entry else ''
-        self.published = entry['published'] if 'published' in entry else ''
+        self.published = entry['created_at'] if 'created_at' in entry else ''
         self.retweeted = entry['retweeted'] if 'retweeted' in entry else 0
         self.favorited = entry['favorited'] if 'favorited' in entry else False
         self.no_users = len(entry['users']) if 'users' in entry else 0
     
     def __str__(self):
-        return self.word
+        return self.word + '\n published: ' + self.published + '\nretweeted: ' + str(self.retweeted) + '\nno_users: ' + str(self.no_users)

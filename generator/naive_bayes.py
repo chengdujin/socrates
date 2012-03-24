@@ -30,6 +30,7 @@ class NaiveBayes(object):
     def train(self):
         'calculate the priors and conditional probabilities'
         r = redis.StrictRedis(REDIS_SERVER)
+        r.flushall()
         for doc in self.docs:
             words = set(doc.category + doc.chinese + doc.latin)
             for label in doc.category:

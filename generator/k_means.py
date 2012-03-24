@@ -123,7 +123,7 @@ class KMeans(object):
         counter = 1
         while centroids_changed:
             print counter, 'round'
-            if counter > 2:
+            if counter > 1:
                 break
             counter += 1
             for point in self.points:
@@ -155,10 +155,8 @@ class KMeans(object):
                         centroid_changed = True
                         new_cluster = Cluster()
                         new_cluster.centroid = new_centroid
-                        print type(new_centroid)
                         clusters.append(new_cluster)
                     else:
-                        print '---------------------------', type(new_centroid), type(old_cluster.centroid)
                         clusters.append(old_cluster)
         self.clusters = clusters
 
