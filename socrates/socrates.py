@@ -46,6 +46,7 @@ def get():
     from pymongo.collection import Collection
     col = Collection(db, 'classified')
 
+    import readable
     print 'read from database ...'
     result = {}
     for label in labels:
@@ -65,6 +66,7 @@ def get():
             for id, key in enumerate(sorted(selected, key=lambda p:-p[0])):
                 sorted_selected.append(selected[id][1])
             result[label[0]] = sorted_selected
+            readable.generate_html(sorted_selected)
             print label[0], ','.join(sorted_selected)
         else:
             print 'no articles found for keyword %s' % label[0]
