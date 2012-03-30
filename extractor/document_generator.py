@@ -19,7 +19,7 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-INPUT = 'twitter/mijia'
+INPUT = 'articles/nbweekly'
 
 def publish(docs, source):
     'leave a mark in database'
@@ -27,20 +27,14 @@ def publish(docs, source):
     database = source_info[0]
     collection = source_info[1]
 
-    from pymongo.errors import CollectionInvalid
     from pymongo.connection import Connection
     con = Connection(DB)
     from pymongo.database import Database
     db = Database(con, database)
     from pymongo.collection import Collection
-    new_collection = collection + '.chinese'
-    col = None
-    try:
-        col = db.create_collection(new_collection)
-    except CollectionInvalid as e:
-        col = Collection(db, new_collection)
+    col = Collection(db, collection)
     for doc in docs:
-        col.insert({'seg':doc.chinese}) 
+        col.update({'_id':doc._id}, {'$set':{'chinese':doc.chinese, 'latin':doc.latin}}) 
 
 def generate(source='articles/cnbeta'):
     'combines cleaner and segmenter'

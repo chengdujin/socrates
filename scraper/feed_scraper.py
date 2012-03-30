@@ -19,8 +19,8 @@ sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
 DB = '176.34.54.120:27017'
-SOURCE_URL = 'http://content.businessvalue.com.cn/feed'
-SOURCE_NAME = 'business_value'.strip().lower()
+SOURCE_URL = "http://www.nbweekly.com/rss/smw/"
+SOURCE_NAME = 'nbweekly'.strip().lower()
 LIMIT = 1000
 GOOGLE_REQUEST_URL = 'http://www.google.com/reader/atom/feed/%s?n=%s'
 
@@ -71,28 +71,31 @@ def parse_feeds(data, limit):
     # every feed item starts from 7 + 2*step
     end = int(limit) * 2 - 1
     for item in xrange(7, 7 + end, 2):
-        feed = {}
-        xml_feeds = root.contents[1].contents[item].contents
-        for xml_feed in xml_feeds:
-            if xml_feed.name == 'entry':
-                info = xml_feed.contents
-                category = []
-                for id, entry in enumerate(info):
-                    if entry.name == 'category':
-                        if not entry['term'][:5] == 'user/':
-                                category.append(entry['term'])
-                    if (id + 1) == len(info):
-                        feed['title'] = entry.contents[0].string
-                        feed['published'] = entry.contents[1].string
-                feed['category'] = category
-                   
-        xml_feeds = root.contents[1].contents[item + 1]
-        feed['source'] = xml_feeds['href']
         try:
-            feed['author'] = xml_feeds.contents[1].contents[0].string
-	except Exception as e:
-	    pass
-        feeds.append(feed)
+            xml_feeds = root.contents[1].contents[item].contents
+            feed = {}
+            for xml_feed in xml_feeds:
+                if xml_feed.name == 'entry':
+                    info = xml_feed.contents
+                    category = []
+                    for id, entry in enumerate(info):
+                        if entry.name == 'category':
+                            if not entry['term'][:5] == 'user/':
+                                category.append(entry['term'])
+                        if (id + 1) == len(info):
+                            feed['title'] = entry.contents[0].string
+                            feed['published'] = entry.contents[1].string
+                    feed['category'] = category
+            try:
+                xml_feeds = root.contents[1].contents[item + 1]
+                feed['source'] = xml_feeds['href']
+                feed['author'] = xml_feeds.contents[1].contents[0].string
+            except Exception as e:
+	             pass
+            if feed:
+                feeds.append(feed)
+        except Exception as ex:
+            pass
     return feeds
     
 

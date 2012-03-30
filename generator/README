@@ -1,7 +1,7 @@
 这个包提供以下功能
 
 1. 微博主题/兴趣提取（interest_generator.py）
-   1) TF/IDF or TextRank
+   1) TF/IDF, TextRank or LDA
    2) Ranker
 
 2. 文章归类聚合（news_generator.py）

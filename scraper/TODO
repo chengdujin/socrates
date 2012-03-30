@@ -1,0 +1,17 @@
+feed_scraper.py
+>> 1. parsing
+>> there are indeed more work that should be done for feed_scraper.py. right now only a limited few numbers of rss resources are supported
+>> in parsing. it is true that providing specific or very detailed parsing strategy against different sources is very tiresome. however, it
+>> is what should be supported.
+>>
+
+twitter_scraper.py
+>> 1. htmlparse
+>> as we all know what was read from twitter source are not completely utf-8, instead, they are encoded by html standards. so it is very imp
+>> ortant to parse them before storing these string values into database. in addition, htmlparsers used in other scripts should be removed
+>>
+>> 2. weibo
+>> the name says it all. 
+>>
+
+
