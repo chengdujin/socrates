@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/blog_bg"
+    android:padding="10dip"
+    >
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/NoAuthorize" />
+    
+    <Spinner android:id="@+id/sp_noAuthorizeType"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="参数类型"
+	android:drawSelectorOnTop="true" 
+	android:prompt="@string/NoAuthorizeType"/>
+    <EditText
+         android:id="@+id/et_userInfo"
+         android:layout_width="256dp"
+         android:layout_height="wrap_content" />
+    <Button
+         android:id="@+id/btn_submit"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/btn_submit" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/OAuth2" />
+    <Button
+         android:id="@+id/btn_OAuth2"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/btn_OAuth2" />
+
+</LinearLayout>

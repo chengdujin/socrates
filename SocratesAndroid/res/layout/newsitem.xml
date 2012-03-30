@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:gravity="center_vertical"
+  android:paddingTop="3.0dip"
+  android:paddingBottom="2.0dip"
+  >
+  <!-- 
+	  <CheckBox android:id="@+id/star"
+            style="?android:attr/starStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6.0dip"
+			android:layout_marginTop="6.0dip"
+            />
+    -->
+    <LinearLayout
+  		android:layout_height="wrap_content"
+  		android:layout_weight="1"
+  		android:layout_width="fill_parent"
+  		android:layout_marginLeft="10.0dip"
+		android:layout_marginTop="4.0dip"
+  		android:orientation="vertical">
+  		<TextView 
+  			 android:id="@+id/newsTitle"
+  			 android:textColor="#FFFFFFFF"
+	         android:textSize="16.0sp"
+	         android:text="news title"
+	         android:ellipsize="marquee"
+	         android:layout_weight="1"
+	         android:layout_width="fill_parent"
+	         android:layout_height="wrap_content"
+	         android:layout_marginRight="5.0dip"
+	         android:singleLine="true"
+			 android:marqueeRepeatLimit="1"
+	         />
+  		<TextView
+  			android:textColor="#E2DBDB"
+  			android:textSize="14sp"
+  			android:layout_weight="1"
+  			android:id="@+id/updateTime"
+  			android:layout_marginRight="5.0dip"
+  			android:layout_width="fill_parent"
+  			android:layout_height="wrap_content"
+  			android:singleLine="true"
+  			android:text="Sat, 9 Oct 2010 01:03:15 GMT"
+  		/>
+  	</LinearLayout>
+  		<ImageView
+		android:id="@+id/viewnews"
+		android:clickable="true"
+		android:layout_marginTop="4.0dip"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/viewnews"
+		>
+	</ImageView>
+</LinearLayout>

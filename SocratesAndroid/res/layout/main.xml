@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/wait"
+    >  
+       <ImageButton 
+            android:id="@+id/btn_sina"
+            android:layout_width="133px"
+            android:layout_height="41px" 
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="20dip"
+            android:layout_alignTop="@+id/iconSelectBtn"
+            android:layout_toRightOf="@+id/iconSelectBtn"
+            android:layout_alignBottom="@+id/iconSelectBtn"
+            android:background="@drawable/btn_sina" >
+            </ImageButton>
+
+       <ImageButton
+           android:id="@+id/btn_twitter"
+           android:layout_width="133px"
+           android:layout_height="41px"
+           android:layout_marginLeft="5dip"
+           android:layout_marginTop="20dip"
+           android:background="@drawable/btn_twitter" />
+
+</LinearLayout>

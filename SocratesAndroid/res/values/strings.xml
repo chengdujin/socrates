@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, SocratesActivity!</string>
+    <string name="app_name">Socrates</string>
+    
+<!--  ChooseAuthorizeActivity    -->
+    <string name="NoAuthorizeType">Parameter type</string>
+    <string name="btn_submit">submit</string>
+    <string name="NoAuthorize">NoAuthorize</string>
+    <string name="OAuth2">OAuth2</string>
+    <string name="btn_OAuth2">OAuth2 Authorize</string>
+<!--  dialog.xml    -->
+    <string name="btn_start">start</string>
+    <string name="btn_cancel">cancel</string> 
+</resources>

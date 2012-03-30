@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:orientation="vertical">
+	<TextView android:id="@+id/news_view_title"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:textSize="20dip" />
+	<ScrollView android:layout_width="wrap_content"
+		android:layout_height="wrap_content">
+		<TextView android:id="@+id/news_view_body"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	</ScrollView>
+</LinearLayout>
