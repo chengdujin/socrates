@@ -1,1 +1,19 @@
-Silence is gold
+# Yuan JIN
+# chengdujin@twitter
+# April 5, 2012
+
+The structure of the backend packages
+
+package generator
+>> scraper   #grepping wiki, news, and tweets
+>> processor   #clean the data, segment the chinese and store
+
+package analyzer   #classify, cluster, rank, topic modeler, relatedness calculator
+
+package exposer
+>> rest   #reveal the necessary interface to front-end clients
+>> layout #layout calculator, readability code
+
+package util
+>> components   #classes
+>> scripts   #twitter-wordpress linker
