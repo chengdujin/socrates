@@ -1,0 +1,5 @@
+# Yuan JIN
+# chengdujin@twitter
+# April 7, 2012
+
+this package contains two sub-packages, namely modeler and ranker. this packages serves multiple purposes. first it should provide some classifier as the base for data analysis. maybe some cluster algorithms are also implemented here. the a topic modeler is presented, i.e. lda. the ranker package is quite important to provide basic ranking facility and therefore is subject to dramatic changes some time later.
