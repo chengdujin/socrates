@@ -19,3 +19,5 @@ package exposer
 package util
 >> components   #classes
 >> scripts   #twitter-wordpress linker
+
+package libs   #libraries
