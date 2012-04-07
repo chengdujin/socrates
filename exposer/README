@@ -1,0 +1,5 @@
+# Yuan JIN
+# chengdujin@twitter
+# April 7, 2012
+
+this package contains two sub-packages, rest and layout. as the name suggest, this package is used to expose data to the outside, namely the client apps/websites, or any other code segments. the rest package creates a RESTful web service for anyone who are interested in getting the data from socrates. the layout package is more traditional which is designed to compute how many web pages should be viewd in a screen, and the readability code is combined and modified here.
