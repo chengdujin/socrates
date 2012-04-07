@@ -1,5 +1,0 @@
-# Yuan JIN
-# chengdujin@twitter
-# April 7, 2012
-
-this package contains two sub-packages, namely scraper and processor. its main focus is to find data from somewhere, and prepare it nicely before presenting it to the data analyzer.
