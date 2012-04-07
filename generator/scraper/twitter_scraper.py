@@ -8,7 +8,7 @@
 # @author Yuan JIN
 # @contact chengdujin@gmail.com
 # @since 2012.03.01
-# @latest 2012.03.01
+# @latest 2012.04.07
 
 # reload the script encoding
 import sys
@@ -16,8 +16,10 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 # CONSTANTS
-DB = '176.34.54.120:27017'
-USER = 'mijia'
+f = open('config', 'r')
+constants = f.readlines()
+CONSTANTS = dict(map(lambda x:tuple((x[:-1] if x[-1] == '\n' else x).split('=')), constants))
+f.close()
 
 def parse_and_store(user, data):
     from pymongo.connection import Connection
