@@ -1,3 +1,5 @@
+TweetMeme should be included to provide search on the popularity of a link on SNS
+
 这个包包含的内容有：
 
 1. 调用所有其他代码的入口代码 socrates.py
