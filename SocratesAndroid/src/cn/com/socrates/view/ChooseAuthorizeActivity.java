@@ -2,11 +2,11 @@ package cn.com.socrates.view;
 
 import java.util.List;
 
-import cn.com.socrates.data.Constant;
-import cn.com.socrates.data.DataHelper;
-import cn.com.socrates.data.ViewerPreferences;
-import cn.com.socrates.domian.UserInfo;
+import cn.com.socrates.bll.UserInfoBll;
+import cn.com.socrates.bll.ViewerPreferences;
+import cn.com.socrates.model.UserInfo;
 import cn.com.socrates.oauth.R;
+import cn.com.socrates.utils.Constant;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -39,7 +39,7 @@ public class ChooseAuthorizeActivity  extends Activity {
 	
 	private String targetNet;
 	private ViewerPreferences viewerPreferences;
-	private DataHelper dbHelper;
+	private UserInfoBll dbHelper;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,7 +95,7 @@ public class ChooseAuthorizeActivity  extends Activity {
 			public void onClick(View v)
 			{
 				//获取账号列表
-				dbHelper=new DataHelper(ChooseAuthorizeActivity.this);
+				dbHelper=new UserInfoBll(ChooseAuthorizeActivity.this);
 		        List<UserInfo> userList= dbHelper.GetUserList(true);
 		        if(userList.isEmpty())
 		        {

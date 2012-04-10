@@ -12,10 +12,10 @@ import android.widget.TextView;
 import java.util.Collections;
 import java.util.List;
 
-import cn.com.socrates.domian.AsyncImageLoader;
-import cn.com.socrates.domian.AsyncImageLoader.ImageCallback;
-import cn.com.socrates.domian.NewInfo;
-import cn.com.socrates.domian.WeiBoInfo;
+import cn.com.socrates.http.AsyncImageLoader;
+import cn.com.socrates.http.AsyncImageLoader.ImageCallback;
+import cn.com.socrates.model.NewInfo;
+import cn.com.socrates.model.WeiBoInfo;
 import cn.com.socrates.oauth.R;
 
 //Œ¢≤©¡–±ÌAdapater

@@ -1,11 +1,11 @@
 package cn.com.socrates.view;
 
-import cn.com.socrates.data.Constant;
-import cn.com.socrates.data.DataHelper;
-import cn.com.socrates.data.ViewerPreferences;
-import cn.com.socrates.domian.UserInfo;
+import cn.com.socrates.bll.UserInfoBll;
+import cn.com.socrates.bll.ViewerPreferences;
+import cn.com.socrates.model.UserInfo;
 import cn.com.socrates.oauth.OAuth;
 import cn.com.socrates.oauth.R;
+import cn.com.socrates.utils.Constant;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -57,7 +57,7 @@ public class AuthorizeActivity extends Activity {
         //在这里处理获取返回的oauth_verifier参数
         UserInfo user= auth.GetAccessToken(intent);
         if(user!=null){
-            DataHelper helper=new DataHelper(this);
+            UserInfoBll helper=new UserInfoBll(this);
             String uid=user.getUserId();
             if(helper.HaveUserInfo(uid))
             {

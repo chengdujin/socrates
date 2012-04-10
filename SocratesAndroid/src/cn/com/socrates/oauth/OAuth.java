@@ -21,7 +21,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.protocol.HTTP;
 
-import cn.com.socrates.domian.UserInfo;
+import cn.com.socrates.model.UserInfo;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;

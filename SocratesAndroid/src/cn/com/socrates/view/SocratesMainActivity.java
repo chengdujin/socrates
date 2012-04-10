@@ -1,8 +1,8 @@
 package cn.com.socrates.view;
 
-import cn.com.socrates.data.Constant;
-import cn.com.socrates.data.ViewerPreferences;
+import cn.com.socrates.bll.ViewerPreferences;
 import cn.com.socrates.oauth.R;
+import cn.com.socrates.utils.Constant;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

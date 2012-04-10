@@ -3,17 +3,17 @@ package cn.com.socrates.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.socrates.data.Constant;
-import cn.com.socrates.data.DataHelper;
-import cn.com.socrates.domian.NewInfo;
-import cn.com.socrates.domian.UserInfo;
-import cn.com.socrates.domian.WeiBoInfo;
-import cn.com.socrates.http.GetWeiboFromSina;
-import cn.com.socrates.http.GetWeiboFromTwitter;
+import cn.com.socrates.bll.SinaBll;
+import cn.com.socrates.bll.TwitterBll;
+import cn.com.socrates.bll.UserInfoBll;
 import cn.com.socrates.http.NewsTest;
+import cn.com.socrates.model.NewInfo;
+import cn.com.socrates.model.UserInfo;
+import cn.com.socrates.model.WeiBoInfo;
 import cn.com.socrates.oauth.R;
 import cn.com.socrates.presentation.NewsAdapter;
 import cn.com.socrates.presentation.WeiBoAdapater;
+import cn.com.socrates.utils.Constant;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,7 +30,7 @@ import android.widget.TabHost;
 public class  BrowserActivity extends Activity {
 
 	private NewsAdapter adapter;
-	private DataHelper dbHelper;
+	private UserInfoBll dbHelper;
 	private List<NewInfo> newsList;
 
     private final AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener()
@@ -74,7 +74,7 @@ public class  BrowserActivity extends Activity {
     		Log.e("BrowserActivity", "noAuthorizeType:"+AuthorizeType);
     		String NoAuthorize_Type=intent.getStringExtra(Constant.NOAUTHORIZE_TYPE);
     		String NoAuthorize_Value=intent.getStringExtra(Constant.NOAUTHORIZE_VALUE);
-    		List<WeiBoInfo> weiboList=new GetWeiboFromTwitter().getWeibo_NoAuthorize_UserIdOrName(NoAuthorize_Type,NoAuthorize_Value);
+    		List<WeiBoInfo> weiboList=new TwitterBll().getWeibo_NoAuthorize_UserIdOrName(NoAuthorize_Type,NoAuthorize_Value);
     		if(weiboList!=null)
             {
     			weiboAdapter.setWeiBoList(weiboList);
@@ -82,7 +82,7 @@ public class  BrowserActivity extends Activity {
     	}
     	else{
     		Log.e("BrowserActivity", "AuthorizeType:"+AuthorizeType);
-    		dbHelper=new DataHelper(BrowserActivity.this);
+    		dbHelper=new UserInfoBll(BrowserActivity.this);
             List<UserInfo> userList= dbHelper.GetUserList(true);
             if(userList.isEmpty())
             {
@@ -90,7 +90,7 @@ public class  BrowserActivity extends Activity {
                 intent.setClass(BrowserActivity.this, AuthorizeActivity.class);
                 startActivity(intent);
             }
-	        List<WeiBoInfo> weiboList=new GetWeiboFromSina().getWeibo_Authorize_UserInfo(userList.get(0));
+	        List<WeiBoInfo> weiboList=new SinaBll().getWeibo_Authorize_UserInfo(userList.get(0));
 	        if(weiboList!=null)
             {
     			weiboAdapter.setWeiBoList(weiboList);

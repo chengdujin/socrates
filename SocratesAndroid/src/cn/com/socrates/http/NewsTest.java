@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import cn.com.socrates.domian.NewInfo;
+import cn.com.socrates.model.NewInfo;
 
 import android.util.Log;
 
